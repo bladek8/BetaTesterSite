@@ -1,0 +1,199 @@
+﻿<style type="text/css">
+    .half-elipese {
+        cursor: pointer;
+        background-color: white;
+        width: 5px;
+        height: 25px;
+        border-radius: 20% / 100%;
+        border-bottom-left-radius: 0;
+        border-top-left-radius: 0;
+        position: absolute;
+        margin-left: 100%;
+        top: 50%;
+        transform: translateY(-50%);
+        text-align: center;
+    }
+
+        .half-elipese:hover {
+            width: 100px;
+        }
+</style>
+<div class="modal fade" id="LoginModal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-md" role="document">
+        <div class="modal-content">
+            <div class="modal-body">
+                <div class="row">
+                    <div class="half-elipese"><strong id="registrarseText"></strong></div>
+                    <div class="col-md-12" id="divLogin">
+                        <div id="alertErrorLogin" class="alert alert-danger fade show text-center" role="alert" style="display: none;">
+                            <strong>Erro ao fazer Login!</strong>
+                        </div>
+                        <h4 class="text-center">Login</h4>
+                        <hr />
+                        <form id="LoginForm">
+                            <div id="LoginGruop">
+                                <div class="form-group">
+                                    <label class="control-label">E-mail</label>
+                                    <input type="text" class="form-control" name="Email" id="Email" />
+                                </div>
+                                <div class="form-group">
+                                    <label class="control-label">Senha</label>
+                                    <input type="password" class="form-control" name="Password" id="Password" />
+                                </div>
+                            </div>
+                            <hr />
+                            <a href="javascript:void(0)">Esqueceu a senha</a>
+                            <button type="button" class="btn btn-success float-right" id="loginButton"><i class="fas fa-sign-in-alt"></i>&nbsp;Login</button>
+                        </form>
+                    </div>
+                    <div class="col-md-6" style="display:none;" id="divRegistre">
+                        <div id="alertErrorRegistre" class="alert alert-danger fade show text-center" role="alert" style="display: none;">
+                            <strong>Erro ao fazer Registro!</strong>
+                        </div>
+                        <h4 class="text-center">Registre-se</h4>
+                        <hr />
+                        <form id="RegistreForm" method="post">
+                            <div style="overflow-y:auto;" id="RegistreGroup">
+                                <div class="form-group">
+                                    <label class="control-label">Usuário</label>
+                                    <input type="text" class="form-control" name="FirstName" id="_Usuario" />
+                                </div>
+                                <div class="form-group">
+                                    <label class="control-label">E-mail</label>
+                                    <input type="text" class="form-control" name="Email" id="_Email" />
+                                </div>
+                                <div class="form-group">
+                                    <label class="control-label">Senha</label>
+                                    <input type="password" class="form-control" name="Password" id="_Password" />
+                                </div>
+                                <div class="form-group">
+                                    <label class="control-label">Confirmação de Senha</label>
+                                    <input type="password" class="form-control" id="_ConfirmePassword" />
+                                </div>
+                            </div>
+                        </form>
+                        <hr />
+                        <button type="button" class="btn btn-success float-right" id="registreButton"><i class="fas fa-check"></i>&nbsp;Registrar</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript">
+    $('#LoginModal').on('shown.bs.modal', function () {
+        $('#RegistreGroup').height($('#LoginGruop').height());
+    });
+
+    $('#LoginOpenbutton').on('click', function () {
+    $('#divLogin').removeClass('col-md-6').addClass('col-md-12');
+    $('#divRegistre').hide();
+    $('.modal-dialog').removeClass('modal-lg').addClass('modal-md');
+    $('.half-elipese').show();
+    });
+
+
+    function LoginValidate() {
+        var hasError = false;
+        $('.text-danger').remove();
+        $('#alertErrorLogin').hide();
+
+        if (IsNullOrWhiteSpace($('#LoginForm #Email').val())) {
+            hasError = true;
+            $('#LoginForm #Email').after('<div class="text-danger">Insira o e-mail!</div>');
+        }
+        else if ($('#LoginForm #Email').val().length < 6 ||
+            $('#LoginForm #Email').val().indexOf("@@") < 1 ||
+            $('#LoginForm #Email').val().indexOf(".") < 1
+        ) {
+            hasError = true;
+            $('#LoginForm #Email').after('<div class="text-danger">E-mail de forma incorreta!</div>');
+        }
+        if (IsNullOrWhiteSpace($('#LoginForm #Password').val())) {
+            hasError = true;
+            $('#LoginForm #Password').after('<div class="text-danger">Insira a senha!</div>');
+        }
+
+        $('#RegistreGroup').height($('#LoginGruop').height());
+        return !hasError;
+    }
+
+    $('#loginButton').click(function () {
+        if (LoginValidate())
+            Login();
+    });
+
+    function Login() {
+        var d = $('#LoginForm').serializeArray();
+		$.post("@Url.Action("Login", "User")", d, function (data) {
+            if (data == true) {
+                window.location.reload();
+            } else {
+                $('#LoginForm #Email').after('<div class="text-danger">Usuário ou senha Incorretos!</div>');
+            }
+		});
+    }
+
+    function RegistreValidate() {
+        var hasError = false;
+        $('.text-danger').remove();
+        $('#alertErrorRegistre').hide();
+
+        if (IsNullOrWhiteSpace($('#RegistreForm #_Usuario').val())) {
+            hasError = true;
+            $('#RegistreForm #_Usuario').after('<div class="text-danger">Insira o usuário!</div>');
+        }
+        if (IsNullOrWhiteSpace($('#RegistreForm #_Email').val())) {
+            hasError = true;
+            $('#RegistreForm #_Email').after('<div class="text-danger">Insira o e-mail!</div>');
+        }
+        if (IsNullOrWhiteSpace($('#RegistreForm #_Password').val())) {
+            hasError = true;
+            $('#RegistreForm #_Password').after('<div class="text-danger">Insira a senha!</div>');
+        }
+        if (IsNullOrWhiteSpace($('#RegistreForm #_ConfirmePassword').val())) {
+            hasError = true;
+            $('#RegistreForm #_ConfirmePassword').after('<div class="text-danger">Insira a confirmação de senha!</div>');
+        }
+        if ($('#RegistreForm #_Password').val() != $('#RegistreForm #_ConfirmePassword').val()) {
+            hasError = true;
+            $('#RegistreForm #_ConfirmePassword').after('<div class="text-danger">A confirmação de senha deve ser igual a senha!</div>');
+        }
+
+        $('#RegistreGroup').height($('#LoginGruop').height());
+        return !hasError;
+    }
+
+	function RegistreSave() {
+        var d = $('#RegistreForm').serializeArray();
+        $.post('@Url.Action("Manage", "User")', d, function (data) {
+            if (data != 0) {
+                alert('Conta criada!');
+                window.location.reload();
+			}
+            else {
+                $('#RegistreForm #_Password').after('<div class="text-danger">A senha deve conter uma letra maiuscula, um número e um caracter especial!</div>');
+                //$('#_UserManagementAlertSuccess').hide();
+				//$('#alertErrorUser').show();
+			}
+		});
+    }
+
+    $('#registreButton').click(function () {
+        if (RegistreValidate())
+            RegistreSave();
+    });
+
+    $('.half-elipese').mouseover(function () {
+        $('#registrarseText').text('Registre-se');
+    }).mouseout(function () {
+        $('#registrarseText').text('');
+        }).click(function () {
+            $('#divLogin').removeClass('col-md-12').addClass('col-md-6');
+            $('#divRegistre').show();
+            $('.modal-dialog').removeClass('modal-md').addClass('modal-lg');
+            $('.half-elipese').hide();
+    });
+
+</script>

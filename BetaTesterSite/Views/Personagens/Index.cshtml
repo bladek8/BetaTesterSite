@@ -1,0 +1,94 @@
+﻿@model int?
+@{
+    ViewData["Title"] = "Index";
+}
+
+<div class="row">
+    <div class="col-md-3"></div>
+    <div class="col-md-6 text-center">
+        @*Imagem vai Aqui!*@
+        <h1 style="font-size:70px;">Personagens</h1>
+    </div>
+</div>
+
+<div class="card bg-light">
+    <div class="card-header">
+        <div class="row">
+            <div class="col-md-3"></div>
+            <div class="col-md-6 text-center">
+                <div class="btn-group" role="group" aria-label="Basic example">
+                    <button type="button" id="betaTesterBtn" class="btn btn-info">Beta Tester</button>
+                    <button type="button" id="jimmyBtn" class="btn btn-info">Jimmy in the hell</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="card-body">
+        <div class="row" id="betaTesterGroup">
+            <img src="~/images/Beta_Tester_Char1 (2).png" class="col-md-3" style="background-color:lightgray; height:300px; margin-left: 4.16666667%; border-radius:15px; cursor:pointer; padding:0;" data-toggle="modal" data-target="#PersonagensModal" alt="">
+            <div class="col-md-1"></div>
+            <img src="~/images/Beta_Tester_Char_Tedio1.png" class="col-md-3" style="background-color:lightgray; height:300px; border-radius:15px; cursor:pointer; padding:0;" data-toggle="modal" data-target="#PersonagensModal" alt="">
+            <div class="col-md-1"></div>
+            <img src="~/images/Beta_Tester_Char_Feliz1.png" class="col-md-3" style="background-color:lightgray; height:300px; border-radius:15px; cursor:pointer; padding:0;" data-toggle="modal" data-target="#PersonagensModal" alt="">
+        </div>
+        <div class="row" id="JimmyGroup" style="display:none;">
+            <img src="~/images/Personagem_Corrida.gif" class="col-md-3" style="background-color:lightgray; height:300px; border-radius:15px; cursor:pointer; padding:0;" data-toggle="modal" data-target="#PersonagensModal" alt="">
+            @*<img src="~/images/Personagem.png" class="col-md-3" style="background-color:lightgray; height:300px; margin-left: 4.16666667%; border-radius:15px; cursor:pointer; padding:0;" data-toggle="modal" data-target="#PersonagensModal" alt="">*@
+            <div class="col-md-1"></div>
+            <img src="~/images/Personagem_Corrida.gif" class="col-md-3" style="background-color:lightgray; height:300px; border-radius:15px; cursor:pointer; padding:0;" data-toggle="modal" data-target="#PersonagensModal" alt="">
+            <div class="col-md-1"></div>
+            <img src="~/images/Personagem_Pulo.gif" class="col-md-3" style="background-color:lightgray; height:300px; border-radius:15px; cursor:pointer; padding:0;" data-toggle="modal" data-target="#PersonagensModal" alt="">
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+    $('#betaTesterBtn').click(function () {
+        $('#betaTesterGroup').show();
+        $('#JimmyGroup').hide();
+    });
+    $('#jimmyBtn').click(function () {
+        $('#betaTesterGroup').hide();
+        $('#JimmyGroup').show();
+    });
+</script>
+
+
+<div class="modal fade" id="PersonagensModal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-sm" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Personagem</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="form-group">
+                            Nunca foi o melhor aluno da turma, mas acho que ele não merecia ter cair no inferno. Para sair dessa, ele precisa salvar seus amigos e roubar o Tridente do Capiroto que tem o poder de voltar no tempo.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@if (Model.HasValue)
+{
+    if (Model == 1)
+    {
+        <script type="text/javascript">
+            $('#betaTesterGroup').show();
+            $('#JimmyGroup').hide();
+        </script>
+    }
+    else if (Model == 2)
+    {
+        <script type="text/javascript">
+            $('#betaTesterGroup').hide();
+            $('#JimmyGroup').show();
+        </script>
+    }
+}

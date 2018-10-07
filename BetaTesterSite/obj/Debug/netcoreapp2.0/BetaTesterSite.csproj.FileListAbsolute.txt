@@ -1,0 +1,11 @@
+C:\Desenvolvimento\Faculdade\BetaTesterSite\BetaTesterSite\bin\Debug\netcoreapp2.0\BetaTesterSite.deps.json
+C:\Desenvolvimento\Faculdade\BetaTesterSite\BetaTesterSite\bin\Debug\netcoreapp2.0\BetaTesterSite.runtimeconfig.json
+C:\Desenvolvimento\Faculdade\BetaTesterSite\BetaTesterSite\bin\Debug\netcoreapp2.0\BetaTesterSite.runtimeconfig.dev.json
+C:\Desenvolvimento\Faculdade\BetaTesterSite\BetaTesterSite\bin\Debug\netcoreapp2.0\BetaTesterSite.dll
+C:\Desenvolvimento\Faculdade\BetaTesterSite\BetaTesterSite\obj\Debug\netcoreapp2.0\BetaTesterSite.csprojResolveAssemblyReference.cache
+C:\Desenvolvimento\Faculdade\BetaTesterSite\BetaTesterSite\obj\Debug\netcoreapp2.0\BetaTesterSite.csproj.CoreCompileInputs.cache
+C:\Desenvolvimento\Faculdade\BetaTesterSite\BetaTesterSite\obj\Debug\netcoreapp2.0\BetaTesterSite.AssemblyInfoInputs.cache
+C:\Desenvolvimento\Faculdade\BetaTesterSite\BetaTesterSite\obj\Debug\netcoreapp2.0\BetaTesterSite.AssemblyInfo.cs
+C:\Desenvolvimento\Faculdade\BetaTesterSite\BetaTesterSite\bin\Debug\netcoreapp2.0\BetaTesterSite.pdb
+C:\Desenvolvimento\Faculdade\BetaTesterSite\BetaTesterSite\obj\Debug\netcoreapp2.0\BetaTesterSite.dll
+C:\Desenvolvimento\Faculdade\BetaTesterSite\BetaTesterSite\obj\Debug\netcoreapp2.0\BetaTesterSite.pdb

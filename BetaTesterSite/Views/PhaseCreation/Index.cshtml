@@ -1,0 +1,594 @@
+﻿@{
+    ViewData["Title"] = "Criação de Fase";
+    int qtdBlocosIniciais = 30;
+}
+
+<style>
+    .sortable, .stuck-sortable {
+        list-style-type: none;
+        padding: 0;
+        float: left;
+    }
+
+        .sortable li, .stuck-sortable li {
+            cursor: grab;   
+            width: 40px;
+        }
+
+            .sortable li img, .stuck-sortable li img {
+                width: 40px;
+                height: 38px;
+                margin: -20px -13px;
+            }
+
+</style>
+<div id="AlertSuccess" class="alert alert-success fade show text-center" style="display: none;">
+    <b>A fase foi salva com sucesso!</b>
+</div>
+<div id="AlertError" class="alert alert-danger fade show text-center" role="alert" style="display: none;">
+    <strong>Atenção!</strong> Arrume os erros!
+</div>
+<div class="card bg-light">
+    <div class="card-header">
+        <h4>Criação de Fase</h4>
+    </div>
+    <div class="card-body">
+        <div class="form-row" style="margin-bottom: 1em;">
+            <div class="col-md-12">
+                <div class="checkbox">
+                    <label><input type="checkbox" id="ItemSelect">&nbsp;Selecionar Item&nbsp;<i class="fas fa-info-circle" data-toggle="tooltip" data-placement="top" title="Quando habilitado os espaços abaixo podem ser selecionados e então escolhido um tipo de bloco para preenche-los"></i></label>
+                </div>
+            </div>
+        </div>
+        <script type="text/javascript">
+            $('#ItemSelect').change(function () {
+                if ($('#ItemSelect')[0].checked) {
+                    $('.sortable').sortable('disable');
+                    $('.stuck-sortable').sortable('disable');
+                    $('.sortable li, .stuck-sortable li').css('cursor', 'pointer');
+                }
+                else {
+                    SetSortable();
+                    $(".sortable").sortable("option", "disabled", false);
+                    $(".stuck-sortable").sortable("option", "disabled", false);
+                    $('.sortable li, .stuck-sortable li').css('cursor', 'grab');
+                }
+            });
+        </script>
+        <div class="form-row" style="margin-bottom: 1em;">
+            <div class="col-md-12">
+                <div id="slider"></div>
+            </div>
+        </div>
+        <div class="" id="row1" style="margin-bottom:1em; overflow-x:auto; overflow-y:hidden; height:400px; user-select:none;" unselectable="on" onselectstart="return false;" onmousedown="return false;">
+            <div class="form-group" id="listGroup">
+                @for (int j = 1; j <= qtdBlocosIniciais; j++)
+                {
+                    <ul id="sortable-@j" class="sortable">
+                        @for (int i = 0; i < 10; i++)
+                        {
+                            <li class="form-control" id="sortItem@(j)-@(i)" data-value="0">&nbsp;</li>
+                        }
+                    </ul>
+                }
+            </div>
+        </div>
+        <hr />
+        <div class="from-row">
+            @*arrumar margin*@
+            <div class="col-md-12" style="margin-bottom:4em; user-select:none;" unselectable="on" onselectstart="return false;" onmousedown="return false;">
+                <ul id="stuckSortable-0" class="stuck-sortable pop" data-popover="true" data-html="true" data-content="bloco padrão<br/><a href=javascript:void(0)' data-toggle='modal' data-target='#VideoExemploModal'>video</a>">
+                    <li class="form-control" style="text-align:center" data-value="1"><img src="~/images/ground_tile1.png" /></li>
+                </ul>
+                <ul id="stuckSortable-1" class="stuck-sortable">
+                    <li class="form-control" style="text-align:center" data-value="2"><img src="~/images/Personagem.png" /></li>
+                </ul>
+                <ul id="stuckSortable-2" class="stuck-sortable">
+                    <li class="form-control" style="text-align:center" data-value="3"><img src="~/images/ground-ramp-right_tile1.png" /></li>
+                </ul>
+                <ul id="stuckSortable-3" class="stuck-sortable">
+                    <li class="form-control" style="text-align:center" data-value="4"><img src="~/images/ground-ramp-left_tile1.png" /></li>
+                </ul>
+            </div>
+        </div>
+        <hr />
+        <div class="row">
+            <div class="col-md-6">
+                <label>Nome*</label>
+                <input type="text" class="form-control" id="PhaseName" placeholder="Nome" />
+            </div>
+        </div>
+    </div>
+    <div class="card-footer">
+        <div class="btn-group float-right">
+            <button class="btn btn-success" data-toggle="modal" data-target="#OpenArchiveModal"><i class="fas fa-download"></i>&nbsp;Carregar Fase</button>
+            <button class="btn btn-success float-right" id="SaveButton"><i class="fas fa-upload"></i>&nbsp;Salvar</button>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+    SetTooltip();
+    function SetTooltip() {
+        $('.pop').popover({
+            selector: '[data-popover]',
+            placement: 'top',
+            trigger: 'manual',
+            html: true,
+            animation: false
+        }).on('mouseenter', function () {
+            var _this = this;
+            $(this).popover('show');
+            $('.popover').on('mouseleave', function () {
+                $(_this).popover('hide');
+            });
+        }).on('mouseleave', function () {
+            var _this = this;
+            setTimeout(function () {
+                if (!$('.popover:hover').length) {
+                    $(_this).popover('hide');
+                }
+            }, 100);
+        });
+    }
+
+    function HasCharacter() {
+        var charQtd = 0;
+        var allLists = $('ul.sortable');
+        for (var i = 0; i < allLists.length; i++) {
+            var childs = $(allLists[i].children);
+            for (var j = 0; j < childs.length; j++) {
+                if ($(childs[j]).data('value') == '2')
+                    charQtd++;
+            }
+        }
+        return charQtd > 1 ? true : false;
+    }
+
+        $("#slider").slider({
+            min: 1,
+            value: @qtdBlocosIniciais,
+            animate: "fast",
+            slide: function (event, ui) {
+                var sliderValue = $("#slider").slider("value");
+                SetLists(sliderValue);
+             }
+        });
+
+    function SetSortable() {
+        var startList;
+        var startIndex;
+        $(".sortable").sortable({
+            connectWith: ".sortable",
+            placeholder: "highlight",
+            start: function (event, ui) {
+                startList = event.currentTarget;
+                startIndex = ui.item.index();
+                var l = $(startList).attr('id').split('-').pop();
+                $('<li class="form-control" id="sortItem' + l + '-' + startIndex + '" data-value="0">&nbsp;</li>').insertAfter($(startList).find('li')[startIndex]);
+            },
+            stop: function (event, ui) {
+                var listId = ui.item.closest('ul').attr('id');
+                if (ui.item.index() == 10)
+                    ui.item.remove();
+                else {
+                    var items = $('#' + listId).sortable("widget")[0].children;
+                    items[ui.item.index() + 1].remove();
+                }
+
+
+                var nextItem = $(startList).find('li').get(startIndex + 1);
+                if ($(nextItem).find('img').length == 1) {
+                    if ($(nextItem).find('img[src="/images/ground_tile2.png"]').length == 1) {
+                        $(nextItem).empty();
+                        $(nextItem).append('<img src="/images/ground_tile1.png" />');
+                    }
+                }
+
+                if (ui.item.prev().find('img').length == 1) {
+                    if (ui.item.find('img[src="/images/ground_tile1.png"]').length == 1) {
+                        ui.item.empty();
+                        ui.item.append('<img src="/images/ground_tile2.png" />');
+                    }
+                } else {
+                    if (ui.item.find('img[src="/images/ground_tile2.png"]').length == 1) {
+                        ui.item.empty();
+                        ui.item.append('<img src="/images/ground_tile1.png" />');
+                    }
+                }
+
+                if (ui.item.next().find('img').length == 1) {
+                    if (ui.item.next().find('img[src="/images/ground_tile1.png"]').length == 1) {
+                        ui.item.next().empty();
+                        ui.item.next().append('<img src="/images/ground_tile2.png" />');
+                    }
+                }
+
+                RemoveExceededItem(listId.split("-").pop());
+            }
+        });
+        $(".stuck-sortable").sortable({
+            connectWith: ".sortable",
+            placeholder: "highlight",
+            start: function (event, ui) {
+                startList = event.currentTarget;
+                var _listId = parseInt($(startList).attr('id').split("-").pop()) + 1;
+                $(startList).append('<li class="form-control" style="text-align:center"  data-value="' + _listId + '">' + GetIcon(_listId) + '</li>');
+            },
+            stop: function (event, ui) {
+                var listId = ui.item.closest('ul').attr('id');
+                if (ui.item.closest('ul').hasClass('stuck-sortable')) {
+                    ui.item.remove();
+                    return;
+                }
+
+                var items = $('#' + listId).sortable("widget")[0].children;
+                var _i = ui.item.index();
+
+                if ($(startList).attr('id') == 'stuckSortable-1' && HasCharacter()) {
+                    ui.item.remove();
+                }
+                else {
+                    if (_i == 10) items[_i].remove();
+                    else items[_i + 1].remove();
+                }
+
+                if (ui.item.prev().find('img').length == 1) {
+                    if (ui.item.find('img[src="/images/ground_tile1.png"]').length == 1) {
+                        ui.item.empty();
+                        ui.item.append('<img src="/images/ground_tile2.png" />');
+                    }
+                }
+
+                if (ui.item.next().find('img').length == 1) {
+                    if (ui.item.next().find('img[src="/images/ground_tile1.png"]').length == 1) {
+                        ui.item.next().empty();
+                        ui.item.next().append('<img src="/images/ground_tile2.png" />');
+                    }
+                }
+                RemoveExceededItem(listId.split("-").pop());
+            }
+        });
+
+        $('.sortable, .stuck-sortable').on('mousedown', '.form-control', function () {
+            if ($('#ItemSelect')[0].checked)
+                $(this).css('cursor', 'pointer');
+            else {
+                $(this).css('cursor', 'grabbing');
+                $('.pop').popover('hide');
+            }
+        }).on('mouseup', '.form-control', function () {
+            if ($('#ItemSelect')[0].checked)
+                $(this).css('cursor', 'pointer');
+            else
+                $(this).css('cursor', 'grab');
+        });
+    }
+    $(window).ready(function () {
+        SetSortable();
+        $('[data-toggle="tooltip"]').tooltip();
+    });
+
+    function RemoveExceededItem(index) {
+        if ($('#sortable-' + index)[0].children.length <= 10) return;
+
+        $('#sortable-' + index)[0].children[$('#sortable-' + index)[0].children.length - 1].remove();
+    }
+
+    function SetLists(size) {
+        size = size < 20 ? 20 : size;
+        if (size > $('#listGroup').find('ul').length) {
+            if ($('#listGroup').find('ul').length < size) {
+                for (var k = $('#listGroup').find('ul').length + 1; k <= size; k++) {
+                    $('#listGroup').append('<ul id="sortable-' + k + '" class="sortable">' +
+                    @for (int i = 0; i < 10; i++)
+                    {
+                        <text>
+                        '<li class="form-control" id="sortItem' + k + '-@(i)"  data-value="0">&nbsp;</li>' +
+                        </text>
+                    }
+                        '</ul>');
+                }
+            }
+
+            var totalWidth = size * 40;
+            $('#listGroup').width(totalWidth);
+            SetSortable();
+
+            if ($('#ItemSelect')[0].checked) {
+                $('.sortable').sortable('disable');
+                $('.stuck-sortable').sortable('disable');
+                $('.sortable li, .stuck-sortable li').css('cursor', 'pointer');
+            }
+
+        }
+        else {
+            $('#listGroup').width((20 * 40) );
+            $('#listGroup').find('ul')[$('#listGroup').find('ul').length - 1].remove();
+            SetLists(size);
+        }
+    }
+
+    function GetIcon(id) {
+        switch (id) {
+            case 1:
+                return '<img src="/images/ground_tile1.png" />';
+            case 2:
+                return '<img src="/images/Personagem.png" />';
+            case 3:
+                return '<img src="/images/ground-ramp-right_tile1.png" />';
+            case 4:
+                return '<img src="/images/ground-ramp-left_tile1.png" />';
+            default:
+                return '&nbsp;';
+        }
+
+    }
+
+    function Save() {
+        var data = new Array();
+        var _data = [];
+        var allLists = $('ul.sortable');
+        for (var i = 0; i < allLists.length; i++) {
+            var childs = $(allLists[i].children);
+            _data = [];
+            for (var j = 0; j < childs.length; j++) {
+                _data.push($(childs[j]).data('value'));
+            }
+            data.push(_data.join(','));
+        }
+
+        $.ajax({
+            url: '@Url.Action("Save", "PhaseCreation")',
+            type: 'POST',
+            data: { Data: data, Name: $('#PhaseName').val() },
+            traditional: true,
+            dataType: 'json',
+            success: function (data) {
+                if (data) {
+                    $('#AlertSuccess').show();
+                    $('#AlertError').hide();
+                    $('#phaseTable').DataTable().ajax.reload();
+                }
+                else {
+                    $('#AlertSuccess').hide();
+                    $('#AlertError').show();
+                }
+                $('html,body').animate({ scrollTop: 0 }, 'slow');
+            }
+        });
+    }
+
+    function Validate() {
+        var hasError = false;
+        $('.text-danger').remove();
+
+        if (IsNullOrWhiteSpace($('#PhaseName').val())) {
+            hasError = true;
+            $('#PhaseName').after('<div class="text-danger">Preencha o nome!</div>');
+        }
+        if (hasError) {
+            $('#AlertSuccess').hide();
+            $('#AlertError').show();
+            $('html,body').animate({ scrollTop: 0 }, 'slow');
+        }
+        return !hasError;
+    }
+
+    $('#SaveButton').click(function () {
+        if (Validate()) {
+            Save();
+        }
+    });
+</script>
+
+<div class="modal fade" id="OpenArchiveModal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Abrir Fase</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div id="alertErrorAttachment" class="alert alert-danger fade show text-center" role="alert" style="display: none;">
+                    <strong>Problema ao abrir a fase!</strong>
+                </div>
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="form-group">
+                            <table id="phaseTable" class="datatable display table table-sm table-bordered table-striped" style="border-collapse: collapse !important; width: 100%">
+                                <thead>
+                                    <tr>
+                                        <th>Nome</th>
+                                        <th style="text-align:center;">&nbsp;</th>
+                                    </tr>
+                                </thead>
+                                <tbody></tbody>
+                            </table>
+                            <script type="text/javascript">
+                                    var phaseTable = $('#phaseTable').DataTable({
+                                        proccessing: true,
+                                        serverSide: true,
+                                        searching: true,
+                                        lengthChange: false,
+                                        autoWidth: false,
+                                        dom: 'tip',
+                                        ajax: {
+                                            url: '@Url.Action("ListPhases", "PhaseCreation")',
+                                            type: 'POST'
+                                        },
+                                        columns: [
+                                            {
+                                                data: 'Name',
+                                                render: function (data, type, row) {
+                                                    return "<a href='javascript:void(0)' onclick='OpenPhase(" + JSON.stringify(row) + ")' >" + row.name + "</a>";
+                                            }
+                                        }
+                                        , {
+                                            orderable: false,
+                                            data: null,
+                                            className: 'text-center',
+                                            render: function (data, type, row) {
+                                                return "<a href='javascript:void(0)' onclick='RemovePhase(" + JSON.stringify(row) + ")'><i class='fas fa-trash'></i></a>";
+                                            }
+                                        }
+		                            ]
+                                });
+
+                                function RemovePhase(id) {
+		                            if (confirm("Deseja realmente excluir esta fase?")) {
+                                        _RemovePhase(id, function () {
+                                            $('#phaseTable').DataTable().ajax.reload();
+                                            alert("Fase excluída com sucesso!");
+			                            });
+		                            }
+	                            }
+
+                                function _RemovePhase(data, callback) {
+		                            $.ajax({
+                                        url: '@Url.Action("RemovePhase", "PhaseCreation")',
+                                        type: 'POST',
+                                        data: { id: data.id },
+                                        traditional: true,
+                                        dataType: 'json',
+			                            success: callback
+		                            });
+                                }
+
+                                function OpenPhase(data) {
+                                    $.ajax({
+                                        url: '@Url.Action("OpenArchive", "PhaseCreation")',
+                                        type: 'POST',
+                                        data: { id: data.id },
+                                        traditional: true,
+                                        dataType: 'json',
+				                        success: function (data) {
+                                            $('#Archive').val("");
+					                        if (data == false) {
+                                                $('#alertErrorAttachment').hide();
+					                        }
+					                        else {
+                                                LoadArchive(data);
+                                                $('#OpenArchiveModal').modal('hide');
+					                        }
+				                        }
+			                        });
+                                }
+                            </script>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <div class="col-md-6">
+                    <button type="button" aria-label="Close" class="btn btn-secondary float-let" data-dismiss="modal"><i class="fa fa-times"></i>&nbsp;Fechar</button>
+                </div>
+                <div class="col-md-6">
+                    <button type="button" class="btn btn-success float-right" id="OpenArchiveButton"><i class="fas fa-download"></i>&nbsp;Carregar Fase</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+    var itemSelecteds = [];
+
+    $('#listGroup').on('click', '.form-control', function () {
+        if ($('#ItemSelect')[0].checked) {
+            if (itemSelecteds.indexOf($(this).attr('id')) == -1) {
+                $(this).css('border-color', 'red');
+                itemSelecteds.push($(this).attr('id'));
+            }
+            else {
+                $(this).css('border-color', '#ced4da');
+                itemSelecteds.splice(itemSelecteds.indexOf($(this).attr('id')), 1);
+            }
+        }
+    });
+
+    $('.stuck-sortable').on('click', function () {
+        var _listId = parseInt($(this).attr('id').split("-").pop()) + 1;
+        if (_listId == 2) return;
+        if ($('#ItemSelect')[0].checked) {
+            $.each(itemSelecteds, function (i, e) {
+                console.log(GetIcon(_listId));
+                $('#' + e).replaceWith('<li class="form-control" id="' + e + '"  data-value="' + _listId + '">' + GetIcon(_listId) + '</li>');
+            });
+            itemSelecteds = [];
+            $('.sortable li, .stuck-sortable li').css('cursor', 'pointer');
+        }
+    });
+
+    function LoadArchive(data) {
+        $('#listGroup').empty();
+        var uls = [];
+        $.each(data, function (i, e) {
+            var ul = $('<ul>', { id: 'sortable-' + (i + 1), class: 'sortable' });
+            $.each(e, function (_i, _e) {
+                var icon = GetIcon(_e);
+                var index = _i - 1;
+                if (_i != 0 && (e[index] != 0 && e[index] != 2)) {
+                    console.log(e[index]);
+                    icon = '<img src="/images/ground_tile2.png" />';
+                }
+
+                ul.append('<li class="form-control" id="sortItem' + i + '-' + _i + '"  data-value="' + _e + '">' + icon + '</li>');
+
+            });
+            uls.push(ul);
+            ul = null;
+        });
+        $('#listGroup').append(uls);
+
+        for (var i = 1; i <= $('#listGroup').children().length; i++)
+            $("#sortable-" + i).css('width', '40px');
+        SetSortable();
+        $("#slider").slider('value', data.length);
+        var totalWidth = data.length * 40;
+        $('#listGroup').width(totalWidth);
+    }
+
+
+
+    var totalWidth = @qtdBlocosIniciais * 40;
+    $('#listGroup').width(totalWidth);
+</script>
+
+<div class="modal fade" id="OpenArchiveModal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Abrir Fase</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div id="alertErrorAttachment" class="alert alert-danger fade show text-center" role="alert" style="display: none;">
+                    <strong>Problema ao abrir a fase!</strong>
+                </div>
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="form-group">
+                            <table id="phaseTable" class="datatable display table table-sm table-bordered table-striped" style="border-collapse: collapse !important; width: 100%">
+                                <thead>
+                                    <tr>
+                                        <th>Nome</th>
+                                        <th style="text-align:center;">&nbsp;</th>
+                                    </tr>
+                                </thead>
+                                <tbody></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <div class="col-md-6">
+                    <button type="button" aria-label="Close" class="btn btn-secondary float-let" data-dismiss="modal"><i class="fa fa-times"></i>&nbsp;Fechar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,109 @@
+﻿@model BetaTesterSite.Models.UserViewModel
+
+@{
+    ViewData["Title"] = "Dados do usuário";
+    string fullName = Model.FirstName + " " + Model.LastName;
+}
+<form id="form" action="@Url.Action("Info","Account")" method="post">
+    <div class="card shadow">
+        <div class="card-header">
+            <i class="fas fa-user"></i>&nbsp;Informações do Usuário
+        </div>
+        <div class="card-body">
+            <input type="hidden" id="UserId" name="UserId" value="@Model.UserId" />
+            <div class="col-md-4 float-left form-control offset-md-1 jumbotron">
+                <h5 class="control-label text-center"><strong>Redefinição da senha</strong></h5>
+                <br />
+                <div class="form-group col-md-12">
+                    <label class="control-label" for="CurrentPassword">Senha Atual</label>
+                    <input type="password" class="form-control" id="CurrentPassword" name="CurrentPassword" placeholder="Senha Atual">
+                </div>
+                <div class="form-group col-md-12">
+                    <label class="control-label" for="NewPassword">Nova Senha</label>
+                    <input type="password" class="form-control" id="NewPassword" name="NewPassword" placeholder="Nova Senha">
+                </div>
+                <div class="form-group col-md-12">
+                    <label class="control-label" for="NewPasswordConfirmation">Confirmação da Nova Senha</label>
+                    <input type="password" class="form-control" id="NewPasswordConfirmation" value="" placeholder="Confirmação de Senha">
+                </div><div style="width: 100%; text-align: center">
+                    <button type="button" id="buttonSubmit" class="btn btn-primary"><i class="fa fa-key"></i>&nbsp;Alterar Senha</button>
+                </div>
+                <script type="text/javascript">
+					$('#buttonSubmit').click(function () {
+
+						var hasError = false;
+						$('#form .invalid-feedback').remove();
+						$('#alertForm').hide();
+
+						if ($('#CurrentPassword').val() == $('#NewPassword').val()) {
+							$('#NewPassword').after('<div class="invalid-feedback">Nova senha precisa ser diferente da senha atual.</div>');
+							hasError = true;
+						}
+
+						if (!IsNullOrWhiteSpace($('#NewPassword').val())) {
+
+							if (IsNullOrWhiteSpace($('#CurrentPassword').val())) {
+								$('#CurrentPassword').after('<div class="invalid-feedback">Preencha a senha atual.</div>');
+								hasError = true;
+							}
+							// Password Confirmation
+							else if (IsNullOrWhiteSpace($('#NewPasswordConfirmation').val())) {
+								$('#NewPasswordConfirmation').after('<div class="invalid-feedback">Preencha a confirmação de senha.</div>');
+								hasError = true;
+							}
+
+							// Wrong Passwords Confirmation
+							else if ($('#NewPasswordConfirmation').val() != $('#NewPassword').val()) {
+								$('#NewPasswordConfirmation').after('<div class="invalid-feedback">Senha de Confirmação errada.</div>');
+								hasError = true;
+							}
+						}
+
+						else {
+							$('#NewPassword').after('<div class="invalid-feedback">Preencha a nova senha.</div>');
+							hasError = true;
+						}
+
+						if (hasError) {
+							$('#alertForm').show();
+							$("html, body").animate({ scrollTop: 0 }, "slow");
+							$('#form .invalid-feedback').show();
+						}
+						else {
+							$('#form').submit();
+						}
+					});
+
+					@*@if (ViewData["ErrorMessage"] != null) {
+						<text>
+							$('#CurrentPassword').after('<div class="invalid-feedback">@ViewData["ErrorMessage"]</div>');
+							$('#alertForm').show();
+							$("html, body").animate({ scrollTop: 0 }, "slow");
+							$('#form .invalid-feedback').show();
+						</text>
+					}*@
+                </script>
+            </div>
+            <div class="col-md-6 float-right">
+                <div class="form-row">
+                    <div class="form-group col-md-12">
+                        <label class="control-label" for="FirstName">Nome Completo</label>
+                        <input type="text" class="form-control" id="FullName" name="FullName" value="@fullName" placeholder="Nome" disabled>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group col-md-12">
+                        <label class="control-label" for="Email">E-mail</label>
+                        <input type="email" class="form-control" id="Email" name="Email" value="@Model.Email" placeholder="E-mail" disabled>
+                    </div>
+                </div>
+                @*<div class="form-row">
+                    <div class="form-group col-md-6">
+                        <label class="control-label" for="PhoneNumber">Telefone</label>
+                        <input type="text" class="form-control phone" id="PhoneNumber" name="PhoneNumber" value="@Model.PhoneNumber" placeholder="Telefone" disabled>
+                    </div>
+                </div>*@
+            </div>
+        </div>
+    </div>
+</form>
