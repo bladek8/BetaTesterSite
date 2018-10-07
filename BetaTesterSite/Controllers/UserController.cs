@@ -9,7 +9,6 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace BetaTesterSite.Controllers
 {
-    //[Authorize]
     public class UserController : Controller
     {
         private readonly SignInManager<DAL.Identity.User> _signInManager;
