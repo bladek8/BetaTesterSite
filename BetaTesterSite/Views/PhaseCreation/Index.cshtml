@@ -196,7 +196,7 @@
                     }
                 }
 
-                if (ui.item.next().find('img').length == 1) {
+                if (ui.item.find('img[src="/images/Personagem.png"]').length != 1 &&  ui.item.next().find('img').length == 1) {
                     if (ui.item.next().find('img[src="/images/ground_tile1.png"]').length == 1) {
                         ui.item.next().empty();
                         ui.item.next().append('<img src="/images/ground_tile2.png" />');
@@ -239,7 +239,7 @@
                     }
                 }
 
-                if (ui.item.next().find('img').length == 1) {
+                if (ui.item.find('img[src="/images/Personagem.png"]').length != 1 && ui.item.next().find('img').length == 1) {
                     if (ui.item.next().find('img[src="/images/ground_tile1.png"]').length == 1) {
                         ui.item.next().empty();
                         ui.item.next().append('<img src="/images/ground_tile2.png" />');
