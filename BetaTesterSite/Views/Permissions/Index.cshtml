@@ -1,0 +1,99 @@
+﻿
+@{
+    ViewData["Title"] = "Permissões dos Usuários";
+
+    var roles = (List<BetaTesterSite.DAL.Identity.Role>)ViewData["Roles"];
+
+    var adminRoleId = roles.Single(x => x.NormalizedName == "ADMINISTRATOR").Id;
+    var guestRoleId = roles.Single(x => x.NormalizedName == "GUEST").Id;
+}
+
+<div class="card">
+    <div class="card-body">
+        @foreach (var role in roles)
+        {
+            <div class="col-md-12 form-group">
+                <label class="control-label">@role.Description</label>
+                <small class="float-right"><a href="javascript:void(0)" onclick="Select('@role.Id');">Adicionar Tudo</a>&nbsp;|&nbsp;<a href="javascript:void(0)" onclick="Deselect('@role.Id');">Remover Tudo</a></small>
+                <select id="@role.Id" multiple="multiple" class="form-control" style="width: 100%;">
+                    @foreach (var item in (List<BetaTesterSite.DAL.Policy>)ViewData["Policies"])
+                    {
+                        <option value="@item.PolicyId">@item.NiceName</option>
+                    }
+                </select>
+            </div>
+            <script type="text/javascript">
+                $('#' + @role.Id).select2();
+            </script>
+        }
+    </div>
+    <div class="card-footer">
+        <button type="button" class="btn btn-success float-right" id="saveButton"><i class="fas fa-cloud-upload-alt"></i>&nbsp;Salvar</button>
+    </div>
+</div>
+
+
+<script type="text/javascript">
+    $('#saveButton').click(function () {
+        var data = { adminPolicyId: $('#' + @adminRoleId).val(), guestPolicyId: $('#' + @guestRoleId).val() };
+		$.ajax({
+			url: '@Url.Action("Manage", "Permissions")',
+			type: 'POST',
+			data: data,
+			dataType: 'json',
+            success: function (d) {
+                alert('dados salvos com sucesso!');
+			}
+		});
+    });
+
+    function ValidatePermission() {
+        var hasError = false;
+        $('.text-danger').remove();
+
+        @foreach (var role in roles)
+        {
+            <text>
+            if (_adminPolicyId.length <= 0) {
+                $('#' + @role.Id).after('<div class="text-danger">Escolha pelo menos uma opção!</div>');
+                hasError = true;
+            }
+            </text>
+        }
+
+        if (hasError) {
+
+        }
+
+        return !hasError
+    }
+
+    $(window).ready(function () {
+        @foreach(var policyRole in (List<BetaTesterSite.DAL.PolicyRole>)ViewData["PolicyRoles"])
+        {
+            <text>
+        var currentDatas = $('#' + @policyRole.RoleId).val();
+        if (currentDatas != null) {
+            currentDatas.push('@policyRole.PolicyId');
+            $('#' + @policyRole.RoleId).val(currentDatas);
+        }
+        else
+            $('#' + @policyRole.RoleId).val('@policyRole.PolicyId');
+            </text>
+        }
+
+        @foreach (var role in roles)
+        {
+            <text>
+            $('#' + @role.Id).trigger('change');
+            </text>
+        }
+    });
+
+    function Deselect(roleId) {
+        $("#" + roleId).val('').change();
+    };
+    function Select(roleId) {
+        $("#" + roleId + " > option").prop("selected", "selected").trigger('change');
+    };
+</script>

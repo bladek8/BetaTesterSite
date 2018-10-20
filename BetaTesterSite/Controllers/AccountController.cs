@@ -56,6 +56,25 @@ namespace BetaTesterSite.Controllers
             return View(model);
         }
 
+        [AllowAnonymous]
+        [HttpPost]
+        [ActionName("Login")]
+        public async Task<IActionResult> _Login(Models.LoginViewModel model, string returnUrl = null)
+        {
+            var result = await this._signInManager.PasswordSignInAsync(model.Email, model.Password, model.RememberMe, false);
+
+            if (result.Succeeded)
+                return await Task.Run<IActionResult>(() => Json(true));
+            else
+                return await Task.Run<IActionResult>(() => Json(false));
+        }
+
+        public async Task<IActionResult> LogOut()
+        {
+            await this._signInManager.SignOutAsync();
+            return await Task.Run<IActionResult>(() => RedirectToAction("Index", "Home"));
+        }
+
 
         Models.UserViewModel GetUserViewModels(DAL.Identity.User data)
         {

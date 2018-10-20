@@ -126,7 +126,7 @@
 
     function Login() {
         var d = $('#LoginForm').serializeArray();
-		$.post("@Url.Action("Login", "User")", d, function (data) {
+		$.post("@Url.Action("Login", "Account")", d, function (data) {
             if (data == true) {
                 window.location.reload();
             } else {

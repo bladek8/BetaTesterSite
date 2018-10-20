@@ -20,6 +20,9 @@
                 height: 38px;
                 margin: -20px -13px;
             }
+    .form-control{
+        border-radius:0;
+    }
 
 </style>
 <div id="AlertSuccess" class="alert alert-success fade show text-center" style="display: none;">
@@ -52,6 +55,8 @@
                     $(".sortable").sortable("option", "disabled", false);
                     $(".stuck-sortable").sortable("option", "disabled", false);
                     $('.sortable li, .stuck-sortable li').css('cursor', 'grab');
+                    $('#listGroup .form-control').css('border-color', '#ced4da');
+                    itemSelecteds = [];
                 }
             });
         </script>
@@ -107,6 +112,8 @@
     </div>
 </div>
 <script type="text/javascript">
+    var draggedItem;
+
     SetTooltip();
     function SetTooltip() {
         $('.pop').popover({
@@ -152,8 +159,8 @@
                 var sliderValue = $("#slider").slider("value");
                 SetLists(sliderValue);
              }
-        });
-
+    });
+    
     function SetSortable() {
         var startList;
         var startIndex;
@@ -161,12 +168,16 @@
             connectWith: ".sortable",
             placeholder: "highlight",
             start: function (event, ui) {
+                draggedItem = ui.item;
+                $(window).mousemove(moved);
                 startList = event.currentTarget;
                 startIndex = ui.item.index();
                 var l = $(startList).attr('id').split('-').pop();
                 $('<li class="form-control" id="sortItem' + l + '-' + startIndex + '" data-value="0">&nbsp;</li>').insertAfter($(startList).find('li')[startIndex]);
             },
             stop: function (event, ui) {
+                $(window).unbind("mousemove", moved);
+                $('ul li').css('background', '').css('border-color', '#ced4da');
                 var listId = ui.item.closest('ul').attr('id');
                 if (ui.item.index() == 10)
                     ui.item.remove();
@@ -174,7 +185,6 @@
                     var items = $('#' + listId).sortable("widget")[0].children;
                     items[ui.item.index() + 1].remove();
                 }
-
 
                 var nextItem = $(startList).find('li').get(startIndex + 1);
                 if ($(nextItem).find('img').length == 1) {
@@ -210,11 +220,15 @@
             connectWith: ".sortable",
             placeholder: "highlight",
             start: function (event, ui) {
+                draggedItem = ui.item;
+                $(window).mousemove(moved);
                 startList = event.currentTarget;
                 var _listId = parseInt($(startList).attr('id').split("-").pop()) + 1;
                 $(startList).append('<li class="form-control" style="text-align:center"  data-value="' + _listId + '">' + GetIcon(_listId) + '</li>');
             },
             stop: function (event, ui) {
+                $(window).unbind("mousemove", moved);
+                $('ul li').css('background', '').css('border-color', '#ced4da');
                 var listId = ui.item.closest('ul').attr('id');
                 if (ui.item.closest('ul').hasClass('stuck-sortable')) {
                     ui.item.remove();
@@ -248,6 +262,46 @@
                 RemoveExceededItem(listId.split("-").pop());
             }
         });
+
+
+        function moved(e) {
+
+            //Dragged item's position++
+            var dpos = draggedItem.position();
+            var d = {
+                top: dpos.top,
+                bottom: dpos.top + draggedItem.height(),
+                left: dpos.left,
+                right: dpos.left + draggedItem.width()
+            };
+
+            //Find sortable elements (li's) covered by draggedItem
+            var hoveredOver = $('.sortable li').not(draggedItem).filter(function () {
+                var t = $(this);
+                var pos = t.position();
+
+                //This li's position++
+                var p = {
+                    top: pos.top,
+                    bottom: pos.top + t.height(),
+                    left: pos.left,
+                    right: pos.left + t.width()
+                };
+
+                //itc = intersect
+                var itcTop = p.top <= d.bottom;
+                var itcBtm = d.top <= p.bottom;
+                var itcLeft = p.left <= d.right;
+                var itcRight = d.left <= p.right;
+
+                return itcTop && itcBtm && itcLeft && itcRight;
+            });
+
+            hoveredOver.each(function () {
+                $('ul li').css('background', '').css('border-color', '#ced4da');
+                $(this).css('background', 'lightgrey').css('border-color', 'red');
+            });
+        };
 
         $('.sortable, .stuck-sortable').on('mousedown', '.form-control', function () {
             if ($('#ItemSelect')[0].checked)
@@ -506,15 +560,32 @@
             }
         }
     });
-
+    
     $('.stuck-sortable').on('click', function () {
         var _listId = parseInt($(this).attr('id').split("-").pop()) + 1;
         if (_listId == 2) return;
         if ($('#ItemSelect')[0].checked) {
             $.each(itemSelecteds, function (i, e) {
-                console.log(GetIcon(_listId));
                 $('#' + e).replaceWith('<li class="form-control" id="' + e + '"  data-value="' + _listId + '">' + GetIcon(_listId) + '</li>');
             });
+
+            $.each(itemSelecteds, function (i, e) {
+                var index = parseInt(e.split('-')[1]);
+                var ul = $('#' + e).closest('ul');
+                var lis = $(ul).find('li');
+                var itemAbove = lis[index - 1];
+                var itemBelow = lis[index + 1];
+
+                if (index > 0 && ($(itemAbove).find('img[src="/images/ground_tile1.png"]').length == 1 || $(itemAbove).find('img[src="/images/ground_tile2.png"]').length == 1)) {
+                    $('#' + e).empty();
+                    $('#' + e).append('<img src="/images/ground_tile2.png" />');
+                }
+                if (index < 9 && ($(itemBelow).find('img[src="/images/ground_tile1.png"]').length == 1)) {
+                    $(itemBelow).empty();
+                    $(itemBelow).append('<img src="/images/ground_tile2.png" />');
+                }
+            });
+
             itemSelecteds = [];
             $('.sortable li, .stuck-sortable li').css('cursor', 'pointer');
         }
@@ -528,8 +599,7 @@
             $.each(e, function (_i, _e) {
                 var icon = GetIcon(_e);
                 var index = _i - 1;
-                if (_i != 0 && (e[index] != 0 && e[index] != 2)) {
-                    console.log(e[index]);
+                if (_i != 0 && (e[index] != 0 && e[index] != 2) && _e == 1) {
                     icon = '<img src="/images/ground_tile2.png" />';
                 }
 

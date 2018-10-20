@@ -1,0 +1,149 @@
+﻿@model BetaTesterSite.Models.UserViewModel
+@{
+    ViewData["Title"] = "Manage";
+}
+<script type="text/javascript">
+
+	function _UserManagementSave() {
+        var d = $('#_UserManagementForm').serializeArray();
+		$.post('@Url.Action("Manage", "User")', d, function (data) {
+            if (data != null) {
+                $('#_UserManagementAlertSuccess').show();
+                $('#alertErrorUser').hide();
+			}
+			else {
+                $('#_UserManagementAlertSuccess').hide();
+				$('#alertErrorUser').show();
+			}
+            $('html,body').animate({ scrollTop: 0 }, 'slow');
+		});
+    }
+
+    function _UserManagementValidate() {
+
+        var _UserManagementhasError = false;
+		$('.text-danger').remove();
+
+        if (IsNullOrWhiteSpace($('#_UserManagementFirstName').val())) {
+            $('#_UserManagementFirstName').after('<div class="text-danger">Preencha o primeiro nome.</div>');
+            _UserManagementhasError = true;
+		}
+
+        if (IsNullOrWhiteSpace($('#_UserManagementEmail').val())) {
+            $('#_UserManagementEmail').after('<div class="text-danger">Preencha um e-mail.</div>');
+            _UserManagementhasError = true;
+        }
+
+        if (IsNullOrWhiteSpace($('#_UserManagementRole').val())) {
+            $('#_UserManagementRole').after('<div class="text-danger">Escolha um Perfil.</div>');
+            _UserManagementhasError = true;
+        }
+
+		@if (Model.UserId == null)
+        {
+			<text>
+        if (IsNullOrWhiteSpace($('#_UserManagementPassword').val())) {
+            $('#_UserManagementPassword').after('<div class="text-danger">Defina uma senha.</div>');
+            _UserManagementhasError = true;
+				}
+
+        if (IsNullOrWhiteSpace($('#_UserManagementPasswordConfirmation').val())) {
+            $('#_UserManagementPasswordConfirmation').after('<div class="text-danger">Preencha a confirmação de senha.</div>');
+            _UserManagementhasError = true;
+				}
+
+        if ($('#_UserManagementPasswordConfirmation').val() != $('#_UserManagementPassword').val()) {
+            $('#_UserManagementPasswordConfirmation').after('<div class="text-danger">Senha de Confirmação errada.</div>');
+					_UserManagementhasError = true;
+				}
+			</text>
+        }
+        if (_UserManagementhasError) {
+            $('#_UserManagementAlertErrorUser').show();
+        }
+
+        return (!_UserManagementhasError);
+
+    }
+
+</script>
+
+<script type="text/javascript">
+    function _UserTakeOffSuccessAlert() {
+        $('#_UserManagementAlertSuccess').hide();
+    }
+</script>
+
+<div id="_UserManagementAlertSuccess" class="alert alert-success fade show text-center" style="display: none;">
+    <b>Os dados foram salvos com sucesso!</b>
+</div>
+<div id="_UserManagementAlertError" class="alert alert-danger fade show text-center" role="alert" style="display: none;">
+    <strong>Atenção!</strong> O Formulário contém erros.
+</div>
+
+<div class="card bg-light">
+    <div class="card-header">
+        Gerenciar usuário
+    </div>
+    <div class="card-body">
+        <form id="_UserManagementForm" method="post">
+            <input type="hidden" id="_UserManagementUserId" name="UserId" value="@Model.UserId" />
+            <div class="form-row">
+                <div class="form-group col-md-6">
+                    <label class="control-label" for="_UserManagementFirstName">Usuário*</label>
+                    <input type="text" class="form-control" id="_UserManagementFirstName" name="FirstName" value="@Model.FirstName" placeholder="Nome">
+                </div>
+                <div class="form-group col-md-6">
+                    <label class="control-label" for="_UserManagementEmail">E-mail*</label>
+                    <input type="email" class="form-control" id="_UserManagementEmail" name="Email" value="@Model.Email" placeholder="E-mail">
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group col-md-4">
+                    <label class="control-label" for="_UserManagementPassword">Senha*</label>
+                    <input type="password" class="form-control" id="_UserManagementPassword" name="Password" value="" placeholder="Senha">
+                </div>
+                <div class="form-group col-md-4">
+                    <label class="control-label" for="_UserManagementPasswordConfirmation">Confirmação de Senha*</label>
+                    <input type="password" class="form-control" id="_UserManagementPasswordConfirmation" value="" placeholder="Confirmação de Senha">
+                </div>
+                <div class="form-group col-md-4">
+                    <label class="control-label">Perfil</label>
+                    <select class="form-control" id="_UserManagementRole" name="Role">
+                        @foreach (var role in (List<BetaTesterSite.DAL.Identity.Role>)ViewData["Roles"])
+                        {
+                            if (Model.Role == role.Description)
+                            {
+                                <option value="@role.Name" selected>@role.Description</option>
+                            }
+                            else
+                            {
+                                <option value="@role.Name">@role.Description</option>
+                            }
+
+                        }
+                    </select>
+                </div>
+            </div>
+        </form>
+    </div>
+    <div class="card-footer">
+        <a href="@Url.Action("Index","User")" class="btn btn-secondary float-left"><i class="fa fa-arrow-left"></i>&nbsp;Voltar</a>
+        <button type="button" id="_UserManagementButtonSubmit" class="btn btn-success float-right"><i class="fa fa-cloud-upload-alt"></i>&nbsp;Criar Usuário</button>
+        <script type="text/javascript">
+            $('#_UserManagementButtonSubmit').click(function () {
+                if (_UserManagementValidate()) {
+                    _UserManagementSave();
+                }
+            });
+        </script>
+        @if (Model.UserId.HasValue)
+        {
+            <text>
+                <script type="text/javascript">
+                    $('#_UserManagementButtonSubmit').text("Salvar");
+                </script>
+            </text>
+        }
+    </div>
+</div>

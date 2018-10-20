@@ -69,7 +69,7 @@
                         console.log(data);
                         var activate = (data.isActive == true ? '<a href="javascript:Inactivate(' + data.userId + ')>Inativar</a>' : '<a href="javascript:Activate(' + data.UserId + ')>Ativar</a>');
 
-                        return '<div class="text-center"><a href="@Url.Action("Manage", "User")/' + row.userId + '">Editar</a>&nbsp;|&nbsp;<a href="javascript:void(0)" onclick="RemoveUser(' + row.userId  + ')" title="Excluir">Excluir</a></div>';
+                        return '<div class="text-center"><a href="@Url.Action("Manage", "User")?id=' + row.userId + '">Editar</a>&nbsp;|&nbsp;<a href="javascript:void(0)" onclick="RemoveUser(' + row.userId  + ')" title="Excluir">Excluir</a></div>';
                     }
                 }
             ]

@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace BetaTesterSite.Controllers
 {
+    [Authorize(Policy = "UserManager")]
     public class UserController : Controller
     {
         private readonly SignInManager<DAL.Identity.User> _signInManager;
@@ -26,12 +27,32 @@ namespace BetaTesterSite.Controllers
             return View();
         }
 
+
+        public IActionResult Manage(int? id)
+        {
+            var user = new Models.UserViewModel();
+            ViewData["Roles"] = context.Role.ToList();
+            if (id.HasValue)
+                user = GetUserViewModels(context.User.SingleOrDefault(x => x.Id == id));
+            return View(user);
+        }
+
         [HttpPost]
         [ActionName("Manage")]
         public async Task<IActionResult> _Manage(UserViewModel model)
         {
-            var a = (from u in context.User select u);
-            var userId = Create(model);
+            int userId;
+            if (model.UserId.HasValue)
+            {
+                Update(model);
+                userId = model.UserId.Value;
+            }
+            else
+                userId = Create(model);
+
+
+            ClearUserRoles(userId);
+            AddUserToRole(userId, model.Role);
 
             return await Task.Run<IActionResult>(() => Json(userId));
         }
@@ -58,47 +79,29 @@ namespace BetaTesterSite.Controllers
                 return user.Id;
             else
                 return 0;
-                //throw new Exception(string.Join(';', identityResult.Errors.Select(x => x.Code)));
-        }
-
-
-        [AllowAnonymous]
-        [HttpPost]
-        [ActionName("Login")]
-        public async Task<IActionResult> _Login(Models.LoginViewModel model, string returnUrl = null)
-        {
-            var result = await this._signInManager.PasswordSignInAsync(model.Email, model.Password, model.RememberMe, false);
-
-            if (result.Succeeded)
-                return await Task.Run<IActionResult>(() => Json(true));
-            else
-                return await Task.Run<IActionResult>(() => Json(false));
-        }
-
-        public async Task<IActionResult> LogOut()
-        {
-            await this._signInManager.SignOutAsync();
-            return await Task.Run<IActionResult>(() => RedirectToAction("Index", "Home"));
+            //throw new Exception(string.Join(';', identityResult.Errors.Select(x => x.Code)));
         }
 
         [HttpPost]
         [ActionName("List")]
-        public async Task<IActionResult> _List(BetaTesterSite.Models.Shared.DataTablesAjaxPostModel filter)
+        public IActionResult _List(BetaTesterSite.Models.Shared.DataTablesAjaxPostModel filter)
         {
             var d = (from y in context.User where y.IsDeleted == false select y);
-
-            return await Task.Run<IActionResult>(() => Json(new
+            var _d = GetUserViewModels(d);
+            return Json(new
             {
                 draw = filter.draw,
                 recordsTotal = d.Count(),
                 recordsFiltered = d.Count(),
-                data = GetUserViewModels(d)
-            }));
+                data = _d
+            });
         }
 
         List<UserViewModel> GetUserViewModels(IQueryable<DAL.Identity.User> data)
         {
             return (from y in data
+                    join ur in context.AspNetUserRoles on y.Id equals ur.UserId
+                    join ro in context.Role on ur.RoleId equals ro.Id
                     select new BetaTesterSite.Models.UserViewModel()
                     {
                         UserId = y.Id,
@@ -106,8 +109,23 @@ namespace BetaTesterSite.Controllers
                         LastName = y.LastName,
                         Email = y.Email,
                         PhoneNumber = y.PhoneNumber,
-                        IsActive = y.IsActive
+                        IsActive = y.IsActive,
+                        Role = ro.Description
                     }).ToList();
+        }
+
+        UserViewModel GetUserViewModels(DAL.Identity.User data)
+        {
+            return new BetaTesterSite.Models.UserViewModel()
+            {
+                UserId = data.Id,
+                FirstName = data.FirstName,
+                LastName = data.LastName,
+                Email = data.Email,
+                PhoneNumber = data.PhoneNumber,
+                IsActive = data.IsActive,
+                Role = GetRoleByUserId(data.Id)
+            };
         }
 
         [HttpPost]
@@ -123,6 +141,61 @@ namespace BetaTesterSite.Controllers
             context.SaveChanges();
 
             return await Task.Run<IActionResult>(() => Json(true));
+        }
+
+        public void Update(UserViewModel model)
+        {
+            var user = context.User.Single(x => x.Id == model.UserId);
+
+            user.FirstName = model.FirstName;
+            user.LastName = model.LastName;
+            user.PhoneNumber = model.PhoneNumber;
+            user.Email = model.Email;
+            user.UserName = model.Email;
+            user.IsActive = model.IsActive;
+            if (!string.IsNullOrWhiteSpace(model.Password))
+                user.PasswordHash = this.userManager.PasswordHasher.HashPassword(user, model.Password);
+
+            this.userManager.UpdateAsync(user);
+
+            this.context.User.Update(user);
+            this.context.SaveChanges();
+        }
+
+
+        public void ClearUserRoles(int userId)
+        {
+            var userRoles = this.context.AspNetUserRoles.Where(x => x.UserId.Equals(userId)).ToArray();
+            for (int i = userRoles.Length - 1; i == 0; i--)
+            {
+                this.context.AspNetUserRoles.Remove(userRoles[i]);
+            }
+            this.context.SaveChanges();
+        }
+
+        public void AddUserToRole(int userId, string role)
+        {
+            var r = this.context.Role.Single(x => x.NormalizedName.Equals(role.ToUpper()));
+            var anur = new DAL.Identity.AspNetUserRoles()
+            {
+                RoleId = r.Id,
+                UserId = userId
+            };
+
+            this.context.Add(anur);
+            this.context.SaveChanges();
+        }
+
+        public string GetRoleByUserId(int id)
+        {
+            var r = (from y in context.User
+                     join ur in context.AspNetUserRoles on y.Id equals ur.UserId
+                     join ro in context.Role on ur.RoleId equals ro.Id
+                     where y.Id == id
+                     select ro.Description);
+
+            return r.Count() > 0 ? r.First() : null;
+            //return  r.Count() > 0 ? r.First() : null;
         }
     }
 }

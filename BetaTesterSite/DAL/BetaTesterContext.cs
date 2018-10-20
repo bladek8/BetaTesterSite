@@ -12,20 +12,13 @@ namespace BetaTesterSite.DAL
         public virtual DbSet<Identity.User> User { get; set; }
         public virtual DbSet<Identity.Role> Role { get; set; }
         public virtual DbSet<Identity.AspNetUserRoles> AspNetUserRoles { get; set; }
+        public virtual DbSet<PolicyRole> PolicyRole { get; set; }
+        public virtual DbSet<Policy> Policy { get; set; }
 
         public BetaTesterContext(DbContextOptionsBuilder<BetaTesterContext> dbContextOptionsBuilder)
             : base(dbContextOptionsBuilder.Options)
         {
         }
-
-        //protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-        //{
-        //    var connectionStringBuilder = new SqliteConnectionStringBuilder { DataSource = "BetaTester.db" };
-        //    var connectionString = connectionStringBuilder.ToString();
-        //    var connection = new SqliteConnection(connectionString);
-
-        //    optionsBuilder.UseSqlite(connection);
-        //}
 
         public BetaTesterContext(DbContextOptions<BetaTesterContext> options)
             : base(options)
@@ -34,7 +27,8 @@ namespace BetaTesterSite.DAL
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            //modelBuilder.Entity<SimpleTable>().ToTable("SimpleTable");
+            modelBuilder.Entity<Policy>().ToTable("Policy");
+            modelBuilder.Entity<PolicyRole>().ToTable("PolicyRole");
             modelBuilder.Entity<Identity.Role>().ToTable("Role");
 
             modelBuilder.Entity<Identity.AspNetUserRoles>(entity =>
