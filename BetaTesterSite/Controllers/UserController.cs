@@ -9,7 +9,6 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace BetaTesterSite.Controllers
 {
-    [Authorize(Policy = "UserManager")]
     public class UserController : Controller
     {
         private readonly SignInManager<DAL.Identity.User> _signInManager;
@@ -22,12 +21,14 @@ namespace BetaTesterSite.Controllers
             this.context = context;
             this._signInManager = signInManager;
         }
+        [Authorize(Policy = "UserManager")]
         public IActionResult Index()
         {
             return View();
         }
 
 
+        [Authorize(Policy = "UserManager")]
         public IActionResult Manage(int? id)
         {
             var user = new Models.UserViewModel();
@@ -39,6 +40,7 @@ namespace BetaTesterSite.Controllers
 
         [HttpPost]
         [ActionName("Manage")]
+        [AllowAnonymous]
         public async Task<IActionResult> _Manage(UserViewModel model)
         {
             int userId;
@@ -52,16 +54,21 @@ namespace BetaTesterSite.Controllers
 
 
             ClearUserRoles(userId);
-            AddUserToRole(userId, model.Role);
+            AddUserToRole(userId, (string.IsNullOrWhiteSpace(model.Role) ? "Administrator" : model.Role));
 
             return await Task.Run<IActionResult>(() => Json(userId));
         }
 
+        [AllowAnonymous]
         public int Create(UserViewModel model)
         {
-            return _Create(model).Result;
+            var id = _Create(model).Result;
+            AddUserToRole(id, "Administrator");
+
+            return id;
         }
 
+        [AllowAnonymous]
         public async Task<int> _Create(UserViewModel model)
         {
             var user = new DAL.Identity.User()
@@ -97,6 +104,7 @@ namespace BetaTesterSite.Controllers
             });
         }
 
+        [Authorize(Policy = "UserManager")]
         List<UserViewModel> GetUserViewModels(IQueryable<DAL.Identity.User> data)
         {
             return (from y in data
@@ -114,6 +122,7 @@ namespace BetaTesterSite.Controllers
                     }).ToList();
         }
 
+        [Authorize(Policy = "UserManager")]
         UserViewModel GetUserViewModels(DAL.Identity.User data)
         {
             return new BetaTesterSite.Models.UserViewModel()
@@ -143,6 +152,7 @@ namespace BetaTesterSite.Controllers
             return await Task.Run<IActionResult>(() => Json(true));
         }
 
+        [Authorize(Policy = "UserManager")]
         public void Update(UserViewModel model)
         {
             var user = context.User.Single(x => x.Id == model.UserId);
@@ -163,6 +173,7 @@ namespace BetaTesterSite.Controllers
         }
 
 
+        [Authorize(Policy = "UserManager")]
         public void ClearUserRoles(int userId)
         {
             var userRoles = this.context.AspNetUserRoles.Where(x => x.UserId.Equals(userId)).ToArray();
@@ -173,6 +184,7 @@ namespace BetaTesterSite.Controllers
             this.context.SaveChanges();
         }
 
+        [AllowAnonymous]
         public void AddUserToRole(int userId, string role)
         {
             var r = this.context.Role.Single(x => x.NormalizedName.Equals(role.ToUpper()));
@@ -186,6 +198,7 @@ namespace BetaTesterSite.Controllers
             this.context.SaveChanges();
         }
 
+        [Authorize(Policy = "UserManager")]
         public string GetRoleByUserId(int id)
         {
             var r = (from y in context.User
