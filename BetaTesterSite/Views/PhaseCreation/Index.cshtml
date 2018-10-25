@@ -11,19 +11,28 @@
     }
 
         .sortable li, .stuck-sortable li {
-            cursor: grab;   
+            cursor: grab;
             width: 40px;
         }
 
-            .sortable li img, .stuck-sortable li img {
+            .sortable li img:not(.trapImg), .stuck-sortable li img:not(.trapImg) {
                 width: 40px;
                 height: 38px;
                 margin: -20px -13px;
             }
-    .form-control{
-        border-radius:0;
+
+    .form-control {
+        border-radius: 0;
     }
 
+    .trapImg {
+        position: absolute;
+        height: 15px;
+        width: 15px;
+        margin: -30px 5px;
+        background-color: rgba(255,255,255,.4);
+        border-radius: 2px;
+    }
 </style>
 <div id="AlertSuccess" class="alert alert-success fade show text-center" style="display: none;">
     <b>A fase foi salva com sucesso!</b>
@@ -42,6 +51,11 @@
                     <label><input type="checkbox" id="ItemSelect">&nbsp;Selecionar Item&nbsp;<i class="fas fa-info-circle" data-toggle="tooltip" data-placement="top" title="Quando habilitado os espaços abaixo podem ser selecionados e então escolhido um tipo de bloco para preenche-los"></i></label>
                 </div>
             </div>
+            <div class="col-md-12">
+                <div class="checkbox">
+                    <label><input type="checkbox" id="TrapCheckBox">&nbsp;Armadilhas&nbsp;<i class="fas fa-info-circle" data-toggle="tooltip" data-placement="top" title=""></i></label>
+                </div>
+            </div>
         </div>
         <script type="text/javascript">
             $('#ItemSelect').change(function () {
@@ -49,8 +63,10 @@
                     $('.sortable').sortable('disable');
                     $('.stuck-sortable').sortable('disable');
                     $('.sortable li, .stuck-sortable li').css('cursor', 'pointer');
+                    mode = 2;
                 }
                 else {
+                    mode = 1;
                     SetSortable();
                     $(".sortable").sortable("option", "disabled", false);
                     $(".stuck-sortable").sortable("option", "disabled", false);
@@ -65,7 +81,7 @@
                 <div id="slider"></div>
             </div>
         </div>
-        <div class="" id="row1" style="margin-bottom:1em; overflow-x:auto; overflow-y:hidden; height:400px; user-select:none;" unselectable="on" onselectstart="return false;" onmousedown="return false;">
+        <div class="" id="row1" style="margin-bottom:1em; overflow-x:auto; overflow-y:hidden; height:410px; user-select:none;" unselectable="on" onselectstart="return false;" onmousedown="return false;">
             <div class="form-group" id="listGroup">
                 @for (int j = 1; j <= qtdBlocosIniciais; j++)
                 {
@@ -79,11 +95,13 @@
             </div>
         </div>
         <hr />
-        <div class="from-row">
-            @*arrumar margin*@
+        <div class="from-row" id="GroundBlocks">
             <div class="col-md-12" style="margin-bottom:4em; user-select:none;" unselectable="on" onselectstart="return false;" onmousedown="return false;">
                 <ul id="stuckSortable-0" class="stuck-sortable pop" data-popover="true" data-html="true" data-content="bloco padrão<br/><a href=javascript:void(0)' data-toggle='modal' data-target='#VideoExemploModal'>video</a>">
-                    <li class="form-control" style="text-align:center" data-value="1"><img src="~/images/ground_tile1.png" /></li>
+                    <li class="form-control" style="text-align:center" data-value="1">
+                        <img style="position:relative;" src="~/images/ground_tile1.png" />
+                        @*<img class="trapImg" src="~/images/Personagem.png" />*@
+                    </li>
                 </ul>
                 <ul id="stuckSortable-1" class="stuck-sortable">
                     <li class="form-control" style="text-align:center" data-value="2"><img src="~/images/Personagem.png" /></li>
@@ -94,6 +112,11 @@
                 <ul id="stuckSortable-3" class="stuck-sortable">
                     <li class="form-control" style="text-align:center" data-value="4"><img src="~/images/ground-ramp-left_tile1.png" /></li>
                 </ul>
+            </div>
+        </div>
+        <div class="from-row" id="TrapBlocks">
+            <div class="col-md-12" style="margin-bottom:4em; user-select:none;" unselectable="on" onselectstart="return false;" onmousedown="return false;">
+                <i>Nenhuma armadilha possível, selecione outro bloco.</i>
             </div>
         </div>
         <hr />
@@ -112,6 +135,10 @@
     </div>
 </div>
 <script type="text/javascript">
+    var mode = 1;
+    var type = 1;
+    var trapDown = [1, 3, 4];
+    var trapUp = [2, 5];
     var draggedItem;
 
     SetTooltip();
@@ -160,7 +187,7 @@
                 SetLists(sliderValue);
              }
     });
-    
+
     function SetSortable() {
         var startList;
         var startIndex;
@@ -266,7 +293,6 @@
 
         function moved(e) {
 
-            //Dragged item's position++
             var dpos = draggedItem.position();
             var d = {
                 top: dpos.top,
@@ -275,12 +301,10 @@
                 right: dpos.left + draggedItem.width()
             };
 
-            //Find sortable elements (li's) covered by draggedItem
             var hoveredOver = $('.sortable li').not(draggedItem).filter(function () {
                 var t = $(this);
                 var pos = t.position();
 
-                //This li's position++
                 var p = {
                     top: pos.top,
                     bottom: pos.top + t.height(),
@@ -288,7 +312,6 @@
                     right: pos.left + t.width()
                 };
 
-                //itc = intersect
                 var itcTop = p.top <= d.bottom;
                 var itcBtm = d.top <= p.bottom;
                 var itcLeft = p.left <= d.right;
@@ -304,14 +327,14 @@
         };
 
         $('.sortable, .stuck-sortable').on('mousedown', '.form-control', function () {
-            if ($('#ItemSelect')[0].checked)
+            if (mode == 2 || type == 2)
                 $(this).css('cursor', 'pointer');
             else {
                 $(this).css('cursor', 'grabbing');
                 $('.pop').popover('hide');
             }
         }).on('mouseup', '.form-control', function () {
-            if ($('#ItemSelect')[0].checked)
+            if (mode == 2 || type == 2)
                 $(this).css('cursor', 'pointer');
             else
                 $(this).css('cursor', 'grab');
@@ -348,7 +371,7 @@
             $('#listGroup').width(totalWidth);
             SetSortable();
 
-            if ($('#ItemSelect')[0].checked) {
+            if (mode == 2) {
                 $('.sortable').sortable('disable');
                 $('.stuck-sortable').sortable('disable');
                 $('.sortable li, .stuck-sortable li').css('cursor', 'pointer');
@@ -549,7 +572,7 @@
     var itemSelecteds = [];
 
     $('#listGroup').on('click', '.form-control', function () {
-        if ($('#ItemSelect')[0].checked) {
+        if (mode == 2) {
             if (itemSelecteds.indexOf($(this).attr('id')) == -1) {
                 $(this).css('border-color', 'red');
                 itemSelecteds.push($(this).attr('id'));
@@ -559,12 +582,28 @@
                 itemSelecteds.splice(itemSelecteds.indexOf($(this).attr('id')), 1);
             }
         }
+
+        if (type == 2) {
+            if (itemSelecteds.indexOf($(this).attr('id')) == -1) {
+                $('.form-control').css('border-color', '#ced4da');
+                itemSelecteds = [];
+
+                $(this).css('border-color', 'red');
+                itemSelecteds.push($(this).attr('id'));
+
+                GetTraps($(this).prev().data('value'), $(this).next().data('value'));
+            }
+            else {
+                $(this).css('border-color', '#ced4da');
+                itemSelecteds.splice(itemSelecteds.indexOf($(this).attr('id')), 1);
+            }
+        }
     });
-    
+
     $('.stuck-sortable').on('click', function () {
         var _listId = parseInt($(this).attr('id').split("-").pop()) + 1;
         if (_listId == 2) return;
-        if ($('#ItemSelect')[0].checked) {
+        if (mode == 2) {
             $.each(itemSelecteds, function (i, e) {
                 $('#' + e).replaceWith('<li class="form-control" id="' + e + '"  data-value="' + _listId + '">' + GetIcon(_listId) + '</li>');
             });
@@ -662,3 +701,37 @@
         </div>
     </div>
 </div>
+
+<script type="text/javascript">
+    $('#TrapCheckBox').change(function () {
+        ChangeMode($('#TrapCheckBox')[0].checked ? 2 : 1);
+    });
+</script>
+
+<script type="text/javascript">
+    function ChangeMode(id) {
+        type = id;
+        if (id == 2) {
+            $('#GroundBlocks').hide();
+            $('#TrapBlocks').show();
+            
+            $('.sortable').sortable('disable');
+            $('.stuck-sortable').sortable('disable');
+            $('.sortable li, .stuck-sortable li').css('cursor', 'pointer');
+        }
+        else {
+            $('#GroundBlocks').show();
+            $('#TrapBlocks').hide();
+
+            SetSortable();
+            $(".sortable").sortable("option", "disabled", false);
+            $(".stuck-sortable").sortable("option", "disabled", false);
+            $('.sortable li, .stuck-sortable li').css('cursor', 'grab');
+            $('#listGroup .form-control').css('border-color', '#ced4da');
+        }
+    }
+
+    function GetTraps(nextData, prevData) {
+
+    }
+</script>
