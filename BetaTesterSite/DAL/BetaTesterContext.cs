@@ -14,6 +14,7 @@ namespace BetaTesterSite.DAL
         public virtual DbSet<Identity.AspNetUserRoles> AspNetUserRoles { get; set; }
         public virtual DbSet<PolicyRole> PolicyRole { get; set; }
         public virtual DbSet<Policy> Policy { get; set; }
+        public virtual DbSet<Phase> Phase { get; set; }
 
         public BetaTesterContext(DbContextOptionsBuilder<BetaTesterContext> dbContextOptionsBuilder)
             : base(dbContextOptionsBuilder.Options)
@@ -27,6 +28,16 @@ namespace BetaTesterSite.DAL
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            modelBuilder.Entity<Phase>(entity =>
+            {
+
+                entity.Property(e => e.Fav).HasDefaultValueSql("((0))");
+                entity.Property(e => e.Played).HasDefaultValueSql("((0))");
+                entity.Property(e => e.Dies).HasDefaultValueSql("((0))");
+                entity.Property(e => e.Completed).HasDefaultValueSql("((0))");
+                entity.Property(e => e.Rate).HasDefaultValueSql("((0))");
+                entity.Property(e => e.Tested).HasDefaultValueSql("((0))");
+            });
             modelBuilder.Entity<Policy>().ToTable("Policy");
             modelBuilder.Entity<PolicyRole>().ToTable("PolicyRole");
             modelBuilder.Entity<Identity.Role>().ToTable("Role");

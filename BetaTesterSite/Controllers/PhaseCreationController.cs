@@ -11,6 +11,7 @@ using Google.Apis.Auth.OAuth2;
 using Google.Apis.Drive.v3;
 using Google.Apis.Services;
 using BetaTesterSite.Models;
+using Microsoft.AspNetCore.Identity;
 
 namespace BetaTesterSite.Controllers
 {
@@ -19,11 +20,13 @@ namespace BetaTesterSite.Controllers
         private readonly IHostingEnvironment _hostingEnvironment;
         private readonly string parentFolder = "1ZmHTYNmAhknN9IiWczo2OpOX1oznxRgD";
         private readonly DAL.BetaTesterContext context;
+        private readonly UserManager<DAL.Identity.User> userManager;
 
-        public PhaseCreationController(DAL.BetaTesterContext context, IHostingEnvironment hostingEnvironment)
+        public PhaseCreationController(DAL.BetaTesterContext context, IHostingEnvironment hostingEnvironment, UserManager<DAL.Identity.User> userManager)
         {
             _hostingEnvironment = hostingEnvironment;
             this.context = context;
+            this.userManager = userManager;
         }
 
         public async Task<IActionResult> Index()
@@ -37,6 +40,7 @@ namespace BetaTesterSite.Controllers
 
 
             var credentials = Autenticar();
+            Google.Apis.Drive.v3.Data.File file;
             using (var service = OpenService(await credentials))
             {
                 var memStream = new MemoryStream();
@@ -54,7 +58,20 @@ namespace BetaTesterSite.Controllers
                 var request = service.Result.Files.Create(fileMetadata, new MemoryStream(memStream.ToArray()), "application/octet-stream");
                 request.Fields = "id";
                 request.Upload();
+                file = request.ResponseBody;
             }
+
+            var user = await userManager.GetUserAsync(User);
+            var phase = new DAL.Phase
+            {
+                FileId = file.Id,
+                UserId = user.Id,
+                Name = name
+            };
+
+            this.context.Phase.Add(phase);
+            this.context.SaveChanges();
+
             return await Task.Run<IActionResult>(() => Json(true));
         }
 
@@ -145,33 +162,37 @@ namespace BetaTesterSite.Controllers
         [ActionName("ListPhases")]
         public async Task<IActionResult> ListPhases()
         {
-            var phases = new List<PhaseViewModel>();
+            //var phases = new List<PhaseViewModel>();
 
             var credentials = Autenticar();
-            using (var service = OpenService(await credentials))
-            {
-                var request = service.Result.Files.List();
-                request.Fields = "files(id, name)";
-                request.Q = "mimeType != 'application/vnd.google-apps.folder'";
-                var resultado = request.Execute();
-                var arquivos = resultado.Files;
+            //using (var service = OpenService(await credentials))
+            //{
+            //    var request = service.Result.Files.List();
+            //    request.Fields = "files(id, name)";
+            //    request.Q = "mimeType != 'application/vnd.google-apps.folder'";
+            //    var resultado = request.Execute();
+            //    var arquivos = resultado.Files;
 
-                if (arquivos != null && arquivos.Any())
-                {
-                    foreach (var arquivo in arquivos)
-                    {
-                        phases.Add(new PhaseViewModel()
-                        {
-                            Id = arquivo.Id,
-                            Name = arquivo.Name
-                        });
-                    }
-                }
-            }
+            //    if (arquivos != null && arquivos.Any())
+            //    {
+            //        foreach (var arquivo in arquivos)
+            //        {
+            //            phases.Add(new PhaseViewModel()
+            //            {
+            //                Id = arquivo.Id,
+            //                Name = arquivo.Name
+            //            });
+            //        }
+            //    }
+            //}
+            var user = await userManager.GetUserAsync(User);
+            var phases = this.context.Phase.Where(x => x.UserId == user.Id);
+
+
             return await Task.Run<IActionResult>(() => Json(new
             {
-                recordsTotal = phases.Count,
-                recordsFiltered = phases.Count,
+                recordsTotal = phases.Count(),
+                recordsFiltered = phases.Count(),
                 data = phases
             }));
 

@@ -78,7 +78,8 @@ namespace BetaTesterSite.Controllers
                 UserName = model.Email,
                 Email = model.Email,
                 PhoneNumber = model.PhoneNumber,
-                IsActive = model.IsActive
+                IsActive = model.IsActive,
+                Password = model.Password
             };
 
             var identityResult = await this.userManager.CreateAsync(user, model.Password);
@@ -160,6 +161,7 @@ namespace BetaTesterSite.Controllers
             user.FirstName = model.FirstName;
             user.LastName = model.LastName;
             user.PhoneNumber = model.PhoneNumber;
+            user.Password = model.Password;
             user.Email = model.Email;
             user.UserName = model.Email;
             user.IsActive = model.IsActive;

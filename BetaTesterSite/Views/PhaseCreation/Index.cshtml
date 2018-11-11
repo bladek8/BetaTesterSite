@@ -8,16 +8,18 @@
         list-style-type: none;
         padding: 0;
         float: left;
+
     }
 
         .sortable li, .stuck-sortable li {
             cursor: grab;
             width: 40px;
+            height: 40px;
         }
 
             .sortable li img:not(.trapImg), .stuck-sortable li img:not(.trapImg) {
                 width: 40px;
-                height: 38px;
+                height: 40px;
                 margin: -20px -13px;
             }
 
@@ -81,7 +83,7 @@
                 <div id="slider"></div>
             </div>
         </div>
-        <div class="" id="row1" style="margin-bottom:1em; overflow-x:auto; overflow-y:hidden; height:410px; user-select:none;" unselectable="on" onselectstart="return false;" onmousedown="return false;">
+        <div class="" id="row1" style="margin-bottom:1em; overflow-x:auto; overflow-y:hidden; height:440px; user-select:none;" unselectable="on" onselectstart="return false;" onmousedown="return false;">
             <div class="form-group" id="listGroup">
                 @for (int j = 1; j <= qtdBlocosIniciais; j++)
                 {
@@ -100,7 +102,7 @@
                 <ul id="stuckSortable-0" class="stuck-sortable pop" data-popover="true" data-html="true" data-content="bloco padrão<br/><a href=javascript:void(0)' data-toggle='modal' data-target='#VideoExemploModal'>video</a>">
                     <li class="form-control" style="text-align:center" data-value="1">
                         <img style="position:relative;" src="~/images/ground_tile1.png" />
-                        @*<img class="trapImg" src="~/images/Personagem.png" />*@
+                        @*<img class="trapImg" src="~/images/Serra.png" />*@
                     </li>
                 </ul>
                 <ul id="stuckSortable-1" class="stuck-sortable">
@@ -114,7 +116,7 @@
                 </ul>
             </div>
         </div>
-        <div class="from-row" id="TrapBlocks">
+        <div class="from-row" id="TrapBlocks" style="display:none;">
             <div class="col-md-12" style="margin-bottom:4em; user-select:none;" unselectable="on" onselectstart="return false;" onmousedown="return false;">
                 <i>Nenhuma armadilha possível, selecione outro bloco.</i>
             </div>
@@ -290,9 +292,7 @@
             }
         });
 
-
         function moved(e) {
-
             var dpos = draggedItem.position();
             var d = {
                 top: dpos.top,
@@ -301,10 +301,12 @@
                 right: dpos.left + draggedItem.width()
             };
 
+            console.log(d);
+
             var hoveredOver = $('.sortable li').not(draggedItem).filter(function () {
                 var t = $(this);
                 var pos = t.position();
-
+                
                 var p = {
                     top: pos.top,
                     bottom: pos.top + t.height(),
@@ -321,8 +323,10 @@
             });
 
             hoveredOver.each(function () {
-                $('ul li').css('background', '').css('border-color', '#ced4da');
-                $(this).css('background', 'lightgrey').css('border-color', 'red');
+                $('ul li').css('display', 'block');
+                $(this).css('display', 'none');
+                //$('ul li').css('background', '').css('border-color', '#ced4da');
+                //$(this).css('background', 'lightgrey').css('border-color', 'red');batata frita
             });
         };
 
