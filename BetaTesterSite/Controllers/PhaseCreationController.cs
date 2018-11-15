@@ -126,6 +126,11 @@ namespace BetaTesterSite.Controllers
                 var request = service.Result.Files.Delete(id);
                 request.Execute();
             }
+
+            var phase = this.context.Phase.Single(x => x.FileId == id);
+            this.context.Phase.Remove(phase);
+            this.context.SaveChanges();
+
             return await Task.Run<IActionResult>(() => Json(true));
         }
 

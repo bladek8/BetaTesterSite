@@ -4,20 +4,23 @@
 }
 
 <style>
-    .sortable, .stuck-sortable {
+    .sortable, .drag-sortable, .back {
         list-style-type: none;
         padding: 0;
         float: left;
-
     }
 
-        .sortable li, .stuck-sortable li {
+        .sortable li, .drag-sortable li, .back li {
             cursor: grab;
             width: 40px;
             height: 40px;
         }
 
-            .sortable li img:not(.trapImg), .stuck-sortable li img:not(.trapImg) {
+        .sortable li {
+            opacity: .1;
+        }
+
+            .sortable li img:not(.trapImg), .drag-sortable li img:not(.trapImg), .back li img:not(.trapImg) {
                 width: 40px;
                 height: 40px;
                 margin: -20px -13px;
@@ -34,6 +37,30 @@
         margin: -30px 5px;
         background-color: rgba(255,255,255,.4);
         border-radius: 2px;
+    }
+
+    #parent {
+        width: 100%;
+        height: 440px;
+        position: relative;
+        margin-bottom: 1em;
+        overflow-x: auto;
+        overflow-y: hidden;
+    }
+
+        #parent div {
+            width: 100%;
+            height: 100%;
+            position: absolute;
+            top: 0;
+            left: 0;
+        }
+
+    .highlight {
+        border: 1px solid red;
+        font-weight: bold;
+        font-size: 45px;
+        background-color: #333333;
     }
 </style>
 <div id="AlertSuccess" class="alert alert-success fade show text-center" style="display: none;">
@@ -63,16 +90,16 @@
             $('#ItemSelect').change(function () {
                 if ($('#ItemSelect')[0].checked) {
                     $('.sortable').sortable('disable');
-                    $('.stuck-sortable').sortable('disable');
-                    $('.sortable li, .stuck-sortable li').css('cursor', 'pointer');
+                    $('.drag-sortable').sortable('disable');
+                    $('.sortable li, .drag-sortable li').css('cursor', 'pointer');
                     mode = 2;
                 }
                 else {
                     mode = 1;
                     SetSortable();
                     $(".sortable").sortable("option", "disabled", false);
-                    $(".stuck-sortable").sortable("option", "disabled", false);
-                    $('.sortable li, .stuck-sortable li').css('cursor', 'grab');
+                    $(".drag-sortable").sortable("option", "disabled", false);
+                    $('.sortable li, .drag-sortable li').css('cursor', 'grab');
                     $('#listGroup .form-control').css('border-color', '#ced4da');
                     itemSelecteds = [];
                 }
@@ -83,35 +110,50 @@
                 <div id="slider"></div>
             </div>
         </div>
-        <div class="" id="row1" style="margin-bottom:1em; overflow-x:auto; overflow-y:hidden; height:440px; user-select:none;" unselectable="on" onselectstart="return false;" onmousedown="return false;">
-            <div class="form-group" id="listGroup">
-                @for (int j = 1; j <= qtdBlocosIniciais; j++)
-                {
-                    <ul id="sortable-@j" class="sortable">
-                        @for (int i = 0; i < 10; i++)
-                        {
-                            <li class="form-control" id="sortItem@(j)-@(i)" data-value="0">&nbsp;</li>
-                        }
-                    </ul>
-                }
+        <div id="parent">
+            <div style="user-select:none;" unselectable="on" onselectstart="return false;" onmousedown="return false;">
+                <div class="form-group listGroup" id="backListGroup">
+                    @for (int j = 1; j <= qtdBlocosIniciais; j++)
+                    {
+                        <ul id="back-@j" class="back">
+                            @for (int i = 0; i < 10; i++)
+                            {
+                                <li class="form-control" id="backItem@(j)-@(i)" data-value="0">&nbsp;</li>
+                            }
+                        </ul>
+                    }
+                </div>
+            </div>
+            <div class="" id="row1" style="z-index:10; user-select:none;" unselectable="on" onselectstart="return false;" onmousedown="return false;">
+                <div class="form-group listGroup" id="listGroup">
+                    @for (int j = 1; j <= qtdBlocosIniciais; j++)
+                    {
+                        <ul id="sortable-@j" class="sortable">
+                            @for (int i = 0; i < 10; i++)
+                            {
+                                <li class="form-control" id="sortItem@(j)-@(i)" data-value="0">&nbsp;</li>
+                            }
+                        </ul>
+                    }
+                </div>
             </div>
         </div>
         <hr />
         <div class="from-row" id="GroundBlocks">
             <div class="col-md-12" style="margin-bottom:4em; user-select:none;" unselectable="on" onselectstart="return false;" onmousedown="return false;">
-                <ul id="stuckSortable-0" class="stuck-sortable pop" data-popover="true" data-html="true" data-content="bloco padrão<br/><a href=javascript:void(0)' data-toggle='modal' data-target='#VideoExemploModal'>video</a>">
+                <ul id="stuckSortable-0" class="drag-sortable pop" data-popover="true" data-html="true" data-content="bloco padrão<br/><a href=javascript:void(0)' data-toggle='modal' data-target='#VideoExemploModal'>video</a>">
                     <li class="form-control" style="text-align:center" data-value="1">
                         <img style="position:relative;" src="~/images/ground_tile1.png" />
                         @*<img class="trapImg" src="~/images/Serra.png" />*@
                     </li>
                 </ul>
-                <ul id="stuckSortable-1" class="stuck-sortable">
+                <ul id="stuckSortable-1" class="drag-sortable">
                     <li class="form-control" style="text-align:center" data-value="2"><img src="~/images/Personagem.png" /></li>
                 </ul>
-                <ul id="stuckSortable-2" class="stuck-sortable">
+                <ul id="stuckSortable-2" class="drag-sortable">
                     <li class="form-control" style="text-align:center" data-value="3"><img src="~/images/ground-ramp-right_tile1.png" /></li>
                 </ul>
-                <ul id="stuckSortable-3" class="stuck-sortable">
+                <ul id="stuckSortable-3" class="drag-sortable">
                     <li class="form-control" style="text-align:center" data-value="4"><img src="~/images/ground-ramp-left_tile1.png" /></li>
                 </ul>
             </div>
@@ -141,7 +183,6 @@
     var type = 1;
     var trapDown = [1, 3, 4];
     var trapUp = [2, 5];
-    var draggedItem;
 
     SetTooltip();
     function SetTooltip() {
@@ -194,76 +235,94 @@
         var startList;
         var startIndex;
         $(".sortable").sortable({
+            placeholder: "highlight",
             connectWith: ".sortable",
             placeholder: "highlight",
             start: function (event, ui) {
-                draggedItem = ui.item;
-                $(window).mousemove(moved);
                 startList = event.currentTarget;
                 startIndex = ui.item.index();
                 var l = $(startList).attr('id').split('-').pop();
+                $(ui.item).empty();
+                $(ui.item).css('opacity','1');
+                if ($('#backItem' + l + '-' + startIndex).find('img').length > 0) {
+                    $(ui.item).append($('#backItem' + l + '-' + startIndex).find('img')[0]);
+                 }
                 $('<li class="form-control" id="sortItem' + l + '-' + startIndex + '" data-value="0">&nbsp;</li>').insertAfter($(startList).find('li')[startIndex]);
             },
             stop: function (event, ui) {
-                $(window).unbind("mousemove", moved);
-                $('ul li').css('background', '').css('border-color', '#ced4da');
+                $('.drag-sortable li').css('background', '').css('border-color', '#ced4da').css('display', 'block');
+                $('.sortable li').css('background', '').css('border-color', '#ced4da').css('display', 'block');
+                $(ui.item).css('opacity', '0');
+
                 var listId = ui.item.closest('ul').attr('id');
-                if (ui.item.index() == 10)
+                var backItems = $('#back-' + listId.split("-").pop()).closest("ul")[0].children;
+                var _startIndex = ui.item.index();
+
+                if (_startIndex == 10)
                     ui.item.remove();
                 else {
                     var items = $('#' + listId).sortable("widget")[0].children;
-                    items[ui.item.index() + 1].remove();
+                    $(backItems[_startIndex]).empty();
+                    if ($(items[_startIndex]).find('img').length > 0) {
+                        $(backItems[_startIndex]).append($(items[_startIndex]).find('img')[0]);
+                    }
+                    items[_startIndex + 1].remove();
                 }
 
-                var nextItem = $(startList).find('li').get(startIndex + 1);
+                var i = $(startList).attr('id').split('-').pop();
+                var _backItems = $('#back-' + i).closest("ul")[0].children;
+                var nextItem = $(_backItems[startIndex + 1]);
+                var item = $(backItems[_startIndex]);
+                var prev = $(backItems[_startIndex - 1]);
+                var next = $(backItems[_startIndex + 1]);
+
                 if ($(nextItem).find('img').length == 1) {
                     if ($(nextItem).find('img[src="/images/ground_tile2.png"]').length == 1) {
                         $(nextItem).empty();
                         $(nextItem).append('<img src="/images/ground_tile1.png" />');
                     }
                 }
-
-                if (ui.item.prev().find('img').length == 1) {
-                    if (ui.item.find('img[src="/images/ground_tile1.png"]').length == 1) {
-                        ui.item.empty();
-                        ui.item.append('<img src="/images/ground_tile2.png" />');
+                if ($(prev).find('img').length == 1) {
+                    if ($(item).find('img[src="/images/ground_tile1.png"]').length == 1) {
+                        $(item).empty();
+                        $(item).append('<img src="/images/ground_tile2.png" />');
                     }
                 } else {
-                    if (ui.item.find('img[src="/images/ground_tile2.png"]').length == 1) {
-                        ui.item.empty();
-                        ui.item.append('<img src="/images/ground_tile1.png" />');
+                    if ($(item).find('img[src="/images/ground_tile2.png"]').length == 1) {
+                        $(item).empty();
+                        $(item).append('<img src="/images/ground_tile1.png" />');
                     }
                 }
 
-                if (ui.item.find('img[src="/images/Personagem.png"]').length != 1 &&  ui.item.next().find('img').length == 1) {
-                    if (ui.item.next().find('img[src="/images/ground_tile1.png"]').length == 1) {
-                        ui.item.next().empty();
-                        ui.item.next().append('<img src="/images/ground_tile2.png" />');
+                if ($(item).find('img[src="/images/Personagem.png"]').length != 1 && $(next).find('img').length == 1) {
+                    if ($(next).find('img[src="/images/ground_tile1.png"]').length == 1) {
+                        $(next).empty();
+                        $(next).append('<img src="/images/ground_tile2.png" />');
                     }
                 }
 
-                RemoveExceededItem(listId.split("-").pop());
+                //RemoveExceededItem(listId.split("-").pop());
             }
         });
-        $(".stuck-sortable").sortable({
+        $(".drag-sortable").sortable({
+            placeholder: "highlight",
             connectWith: ".sortable",
             placeholder: "highlight",
             start: function (event, ui) {
-                draggedItem = ui.item;
-                $(window).mousemove(moved);
                 startList = event.currentTarget;
                 var _listId = parseInt($(startList).attr('id').split("-").pop()) + 1;
                 $(startList).append('<li class="form-control" style="text-align:center"  data-value="' + _listId + '">' + GetIcon(_listId) + '</li>');
             },
             stop: function (event, ui) {
-                $(window).unbind("mousemove", moved);
-                $('ul li').css('background', '').css('border-color', '#ced4da');
+                $('.drag-sortable li').css('background', '').css('border-color', '#ced4da').css('display', 'block');
+                $('.sortable li').css('background', '').css('border-color', '#ced4da').css('display', 'block');
                 var listId = ui.item.closest('ul').attr('id');
-                if (ui.item.closest('ul').hasClass('stuck-sortable')) {
+                if (ui.item.closest('ul').hasClass('drag-sortable')) {
                     ui.item.remove();
                     return;
                 }
 
+                var backItems = $('#back-' + listId.split("-").pop()).closest("ul")[0].children;
                 var items = $('#' + listId).sortable("widget")[0].children;
                 var _i = ui.item.index();
 
@@ -271,66 +330,38 @@
                     ui.item.remove();
                 }
                 else {
+                    $(backItems[_i]).empty();
+                    if ($(items[_i]).find('img').length > 0) {
+                        $(backItems[_i]).append($(items[_i]).find('img')[0]);
+                    }
                     if (_i == 10) items[_i].remove();
                     else items[_i + 1].remove();
                 }
 
-                if (ui.item.prev().find('img').length == 1) {
-                    if (ui.item.find('img[src="/images/ground_tile1.png"]').length == 1) {
-                        ui.item.empty();
-                        ui.item.append('<img src="/images/ground_tile2.png" />');
+                var i = $(startList).attr('id').split('-').pop();
+                var item = $(backItems[_i]);
+                var prev = $(backItems[_i - 1]);
+                var next = $(backItems[_i + 1]);
+
+                if ($(prev).find('img').length == 1) {
+                    if ($(item).find('img[src="/images/ground_tile1.png"]').length == 1) {
+                        $(item).empty();
+                        $(item).append('<img src="/images/ground_tile2.png" />');
                     }
                 }
 
-                if (ui.item.find('img[src="/images/Personagem.png"]').length != 1 && ui.item.next().find('img').length == 1) {
-                    if (ui.item.next().find('img[src="/images/ground_tile1.png"]').length == 1) {
-                        ui.item.next().empty();
-                        ui.item.next().append('<img src="/images/ground_tile2.png" />');
+                if ($(item).find('img[src="/images/Personagem.png"]').length != 1 && $(next).find('img').length == 1) {
+                    if ($(next).find('img[src="/images/ground_tile1.png"]').length == 1) {
+                        $(next).empty();
+                        $(next).append('<img src="/images/ground_tile2.png" />');
                     }
                 }
-                RemoveExceededItem(listId.split("-").pop());
+                
+                //RemoveExceededItem(listId.split("-").pop());
             }
         });
 
-        function moved(e) {
-            var dpos = draggedItem.position();
-            var d = {
-                top: dpos.top,
-                bottom: dpos.top + draggedItem.height(),
-                left: dpos.left,
-                right: dpos.left + draggedItem.width()
-            };
-
-            console.log(d);
-
-            var hoveredOver = $('.sortable li').not(draggedItem).filter(function () {
-                var t = $(this);
-                var pos = t.position();
-                
-                var p = {
-                    top: pos.top,
-                    bottom: pos.top + t.height(),
-                    left: pos.left,
-                    right: pos.left + t.width()
-                };
-
-                var itcTop = p.top <= d.bottom;
-                var itcBtm = d.top <= p.bottom;
-                var itcLeft = p.left <= d.right;
-                var itcRight = d.left <= p.right;
-
-                return itcTop && itcBtm && itcLeft && itcRight;
-            });
-
-            hoveredOver.each(function () {
-                $('ul li').css('display', 'block');
-                $(this).css('display', 'none');
-                //$('ul li').css('background', '').css('border-color', '#ced4da');
-                //$(this).css('background', 'lightgrey').css('border-color', 'red');batata frita
-            });
-        };
-
-        $('.sortable, .stuck-sortable').on('mousedown', '.form-control', function () {
+        $('.sortable, .drag-sortable').on('mousedown', '.form-control', function () {
             if (mode == 2 || type == 2)
                 $(this).css('cursor', 'pointer');
             else {
@@ -349,18 +380,18 @@
         $('[data-toggle="tooltip"]').tooltip();
     });
 
-    function RemoveExceededItem(index) {
-        if ($('#sortable-' + index)[0].children.length <= 10) return;
+    //function RemoveExceededItem(index) {
+    //    if ($('#sortable-' + index)[0].children.length <= 10) return;
 
-        $('#sortable-' + index)[0].children[$('#sortable-' + index)[0].children.length - 1].remove();
-    }
+    //    $('#sortable-' + index)[0].children[$('#sortable-' + index)[0].children.length - 1].remove();
+    //}
 
     function SetLists(size) {
         size = size < 20 ? 20 : size;
         if (size > $('#listGroup').find('ul').length) {
             if ($('#listGroup').find('ul').length < size) {
                 for (var k = $('#listGroup').find('ul').length + 1; k <= size; k++) {
-                    $('#listGroup').append('<ul id="sortable-' + k + '" class="sortable">' +
+                    $('.listGroup').append('<ul id="sortable-' + k + '" class="sortable">' +
                     @for (int i = 0; i < 10; i++)
                     {
                         <text>
@@ -372,19 +403,19 @@
             }
 
             var totalWidth = size * 40;
-            $('#listGroup').width(totalWidth);
+            $('.listGroup').width(totalWidth);
             SetSortable();
 
             if (mode == 2) {
                 $('.sortable').sortable('disable');
-                $('.stuck-sortable').sortable('disable');
-                $('.sortable li, .stuck-sortable li').css('cursor', 'pointer');
+                $('.drag-sortable').sortable('disable');
+                $('.sortable li, .drag-sortable li').css('cursor', 'pointer');
             }
 
         }
         else {
-            $('#listGroup').width((20 * 40) );
-            $('#listGroup').find('ul')[$('#listGroup').find('ul').length - 1].remove();
+            $('.listGroup').width((20 * 40) );
+            $('.listGroup').find('ul')[$('.listGroup').find('ul').length - 1].remove();
             SetLists(size);
         }
     }
@@ -408,7 +439,7 @@
     function Save() {
         var data = new Array();
         var _data = [];
-        var allLists = $('ul.sortable');
+        var allLists = $('ul.back');
         for (var i = 0; i < allLists.length; i++) {
             var childs = $(allLists[i].children);
             _data = [];
@@ -530,7 +561,7 @@
 		                            $.ajax({
                                         url: '@Url.Action("RemovePhase", "PhaseCreation")',
                                         type: 'POST',
-                                        data: { id: data.id },
+                                        data: { id: data.fileId },
                                         traditional: true,
                                         dataType: 'json',
 			                            success: callback
@@ -541,7 +572,7 @@
                                     $.ajax({
                                         url: '@Url.Action("OpenArchive", "PhaseCreation")',
                                         type: 'POST',
-                                        data: { id: data.id },
+                                        data: { id: data.fileId },
                                         traditional: true,
                                         dataType: 'json',
 				                        success: function (data) {
@@ -579,10 +610,12 @@
         if (mode == 2) {
             if (itemSelecteds.indexOf($(this).attr('id')) == -1) {
                 $(this).css('border-color', 'red');
+                $(this).css('opacity', '.5');
                 itemSelecteds.push($(this).attr('id'));
             }
             else {
                 $(this).css('border-color', '#ced4da');
+                $(this).css('opacity', '.1');
                 itemSelecteds.splice(itemSelecteds.indexOf($(this).attr('id')), 1);
             }
         }
@@ -590,6 +623,7 @@
         if (type == 2) {
             if (itemSelecteds.indexOf($(this).attr('id')) == -1) {
                 $('.form-control').css('border-color', '#ced4da');
+                $('.sortable li').css('opacity', '.1');
                 itemSelecteds = [];
 
                 $(this).css('border-color', 'red');
@@ -604,41 +638,50 @@
         }
     });
 
-    $('.stuck-sortable').on('click', function () {
+    $('.drag-sortable').on('click', function () {
         var _listId = parseInt($(this).attr('id').split("-").pop()) + 1;
         if (_listId == 2) return;
         if (mode == 2) {
             $.each(itemSelecteds, function (i, e) {
-                $('#' + e).replaceWith('<li class="form-control" id="' + e + '"  data-value="' + _listId + '">' + GetIcon(_listId) + '</li>');
+                console.log(e);
+                var idData = e.split('sortItem')[1];
+                var listIndex = idData.split('-')[0];
+                $($('#back-' + listIndex).children()[$('#' + e).index()]).replaceWith('<li class="form-control" id="backItem' + listIndex + '-' + $('#' + e).index() + '"  data-value="' + _listId + '">' + GetIcon(_listId) + '</li>');
+                //$('#' + e).replaceWith('<li class="form-control" id="' + e + '"  data-value="' + _listId + '">' + GetIcon(_listId) + '</li>');
             });
 
             $.each(itemSelecteds, function (i, e) {
-                var index = parseInt(e.split('-')[1]);
-                var ul = $('#' + e).closest('ul');
+                var listIndex = e.split('sortItem')[1].split('-')[0];
+                var index = parseInt($('#' + e).index());
+                var ul = $('#back-' + listIndex);
                 var lis = $(ul).find('li');
+                var item = $($('#back-' + listIndex).children()[index]);
                 var itemAbove = lis[index - 1];
                 var itemBelow = lis[index + 1];
 
-                if (index > 0 && ($(itemAbove).find('img[src="/images/ground_tile1.png"]').length == 1 || $(itemAbove).find('img[src="/images/ground_tile2.png"]').length == 1)) {
-                    $('#' + e).empty();
-                    $('#' + e).append('<img src="/images/ground_tile2.png" />');
+                if ($(itemAbove).find('img').length == 1) { //[src="/images/ground_tile1.png"]').length == 1 || $(itemAbove).find('img[src="/images/ground_tile2.png"]').length == 1) {
+                    $(item).empty();
+                    $(item).append('<img src="/images/ground_tile2.png" />');
                 }
-                if (index < 9 && ($(itemBelow).find('img[src="/images/ground_tile1.png"]').length == 1)) {
+                if ($(itemBelow).find('img[src="/images/ground_tile1.png"]').length == 1) {
                     $(itemBelow).empty();
                     $(itemBelow).append('<img src="/images/ground_tile2.png" />');
                 }
             });
 
+            $('.sortable li').css('opacity', '.1');
             itemSelecteds = [];
-            $('.sortable li, .stuck-sortable li').css('cursor', 'pointer');
+            $('.sortable li, .drag-sortable li').css('cursor', 'pointer');
         }
     });
 
     function LoadArchive(data) {
-        $('#listGroup').empty();
+        $('.listGroup').empty();
         var uls = [];
+        var _uls = [];
         $.each(data, function (i, e) {
-            var ul = $('<ul>', { id: 'sortable-' + (i + 1), class: 'sortable' });
+            var ul = $('<ul>', { id: 'back-' + (i + 1), class: 'back' });
+            var _ul = $('<ul>', { id: 'sortable-' + (i + 1), class: 'sortable' });
             $.each(e, function (_i, _e) {
                 var icon = GetIcon(_e);
                 var index = _i - 1;
@@ -646,26 +689,32 @@
                     icon = '<img src="/images/ground_tile2.png" />';
                 }
 
-                ul.append('<li class="form-control" id="sortItem' + i + '-' + _i + '"  data-value="' + _e + '">' + icon + '</li>');
+                ul.append('<li class="form-control" id="backItem' + (i + 1) + '-' + _i + '"  data-value="' + _e + '">' + icon + '</li>');
+                _ul.append('<li class="form-control" id="sortItem' + (i + 1) + '-' + _i + '"  data-value="0">&nbsp;</li>');
 
             });
             uls.push(ul);
+            _uls.push(_ul);
             ul = null;
+            _ul = null;
         });
-        $('#listGroup').append(uls);
+        $('#backListGroup').append(uls); 
+        $('#listGroup').append(_uls);
 
-        for (var i = 1; i <= $('#listGroup').children().length; i++)
-            $("#sortable-" + i).css('width', '40px');
+        //for (var i = 1; i <= $('#listGroup').children().length; i++) {
+        //    $("#backItem-" + i).css('width', '40px');
+        //    $("#sortItem-" + i).css('width', '40px');
+        //}
         SetSortable();
         $("#slider").slider('value', data.length);
         var totalWidth = data.length * 40;
-        $('#listGroup').width(totalWidth);
+        $('.listGroup').width(totalWidth);
     }
 
 
 
     var totalWidth = @qtdBlocosIniciais * 40;
-    $('#listGroup').width(totalWidth);
+    $('.listGroup').width(totalWidth);
 </script>
 
 <div class="modal fade" id="OpenArchiveModal" tabindex="-1" role="dialog" aria-hidden="true">
@@ -718,10 +767,10 @@
         if (id == 2) {
             $('#GroundBlocks').hide();
             $('#TrapBlocks').show();
-            
+
             $('.sortable').sortable('disable');
-            $('.stuck-sortable').sortable('disable');
-            $('.sortable li, .stuck-sortable li').css('cursor', 'pointer');
+            $('.drag-sortable').sortable('disable');
+            $('.sortable li, .drag-sortable li').css('cursor', 'pointer');
         }
         else {
             $('#GroundBlocks').show();
@@ -729,8 +778,8 @@
 
             SetSortable();
             $(".sortable").sortable("option", "disabled", false);
-            $(".stuck-sortable").sortable("option", "disabled", false);
-            $('.sortable li, .stuck-sortable li').css('cursor', 'grab');
+            $(".drag-sortable").sortable("option", "disabled", false);
+            $('.sortable li, .drag-sortable li').css('cursor', 'grab');
             $('#listGroup .form-control').css('border-color', '#ced4da');
         }
     }
