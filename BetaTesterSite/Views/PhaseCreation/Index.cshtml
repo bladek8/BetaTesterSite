@@ -34,7 +34,7 @@
         position: absolute;
         height: 15px;
         width: 15px;
-        margin: -30px 5px;
+        margin: -7px -2px;
         background-color: rgba(255,255,255,.4);
         border-radius: 2px;
     }
@@ -88,11 +88,19 @@
         </div>
         <script type="text/javascript">
             $('#ItemSelect').change(function () {
+                SetSortable();
                 if ($('#ItemSelect')[0].checked) {
-                    $('.sortable').sortable('disable');
-                    $('.drag-sortable').sortable('disable');
+                    $(".sortable").sortable("option", "disabled", true);
+                    $(".drag-sortable").sortable("option", "disabled", true);
                     $('.sortable li, .drag-sortable li').css('cursor', 'pointer');
                     mode = 2;
+                    type = 1;
+                    itemSelecteds = [];
+                    $('#TrapCheckBox')[0].checked = false;
+                    $('#listGroup .form-control').css('border-color', '');
+                    $('.sortable li').css('opacity', '.1');
+                    $('#GroundBlocks').show();
+                    $('#TrapBlocks').hide();
                 }
                 else {
                     mode = 1;
@@ -156,11 +164,15 @@
                 <ul id="stuckSortable-3" class="drag-sortable">
                     <li class="form-control" style="text-align:center" data-value="4"><img src="~/images/ground-ramp-left_tile1.png" /></li>
                 </ul>
+                <ul id="stuckSortable-4" class="drag-sortable">
+                    <li class="form-control" style="text-align:center" data-value="5"><img src="~/images/flag.png" /></li>
+                </ul>
             </div>
         </div>
         <div class="from-row" id="TrapBlocks" style="display:none;">
-            <div class="col-md-12" style="margin-bottom:4em; user-select:none;" unselectable="on" onselectstart="return false;" onmousedown="return false;">
-                <i>Nenhuma armadilha possível, selecione outro bloco.</i>
+            <div class="col-md-12" style="margin-bottom:4em; user-select:none;" unselectable="on" onselectstart="return false;" onmousedown="return false;" id="TrapDiv">
+                <i id="noTrapMessage">Nenhuma armadilha possível, selecione outro bloco.</i>
+
             </div>
         </div>
         <hr />
@@ -181,8 +193,7 @@
 <script type="text/javascript">
     var mode = 1;
     var type = 1;
-    var trapDown = [1, 3, 4];
-    var trapUp = [2, 5];
+    var trapGroundNotAbove = [5];
 
     SetTooltip();
     function SetTooltip() {
@@ -246,10 +257,12 @@
                 $(ui.item).css('opacity','1');
                 if ($('#backItem' + l + '-' + startIndex).find('img').length > 0) {
                     $(ui.item).append($('#backItem' + l + '-' + startIndex).find('img')[0]);
+                    $(ui.item).data('value', $('#backItem' + l + '-' + startIndex).data('value'));
                  }
                 $('<li class="form-control" id="sortItem' + l + '-' + startIndex + '" data-value="0">&nbsp;</li>').insertAfter($(startList).find('li')[startIndex]);
             },
             stop: function (event, ui) {
+                console.log($(ui.item).data('value'));
                 $('.drag-sortable li').css('background', '').css('border-color', '#ced4da').css('display', 'block');
                 $('.sortable li').css('background', '').css('border-color', '#ced4da').css('display', 'block');
                 $(ui.item).css('opacity', '0');
@@ -262,6 +275,7 @@
                     ui.item.remove();
                 else {
                     var items = $('#' + listId).sortable("widget")[0].children;
+                    $(backItems[_startIndex]).data('value', $(ui.item).data('value'));
                     $(backItems[_startIndex]).empty();
                     if ($(items[_startIndex]).find('img').length > 0) {
                         $(backItems[_startIndex]).append($(items[_startIndex]).find('img')[0]);
@@ -282,25 +296,34 @@
                         $(nextItem).append('<img src="/images/ground_tile1.png" />');
                     }
                 }
-                if ($(prev).find('img').length == 1) {
+                if ($(prev).find('img').length == 1 && $(prev).data('value') != 2) {
                     if ($(item).find('img[src="/images/ground_tile1.png"]').length == 1) {
                         $(item).empty();
                         $(item).append('<img src="/images/ground_tile2.png" />');
                     }
-                } else {
+                }
+                else {
                     if ($(item).find('img[src="/images/ground_tile2.png"]').length == 1) {
                         $(item).empty();
                         $(item).append('<img src="/images/ground_tile1.png" />');
                     }
                 }
+                
+                if ($(item).find('img').length == 0) {
+                    if ($(next).find('img[src="/images/ground_tile2.png"]').length == 1) {
+                        $(next).empty();
+                        $(next).append('<img src="/images/ground_tile1.png" />');
+                    }
+                }
 
-                if ($(item).find('img[src="/images/Personagem.png"]').length != 1 && $(next).find('img').length == 1) {
+                if ($(item).data('value') != 2 && $(item).find('img').length == 1 && $(next).find('img').length == 1) {
                     if ($(next).find('img[src="/images/ground_tile1.png"]').length == 1) {
                         $(next).empty();
                         $(next).append('<img src="/images/ground_tile2.png" />');
                     }
                 }
 
+                SetIds();
                 //RemoveExceededItem(listId.split("-").pop());
             }
         });
@@ -331,6 +354,7 @@
                 }
                 else {
                     $(backItems[_i]).empty();
+                    $(backItems[_i]).data('value', $(items[_i]).data('value'));
                     if ($(items[_i]).find('img').length > 0) {
                         $(backItems[_i]).append($(items[_i]).find('img')[0]);
                     }
@@ -343,20 +367,21 @@
                 var prev = $(backItems[_i - 1]);
                 var next = $(backItems[_i + 1]);
 
-                if ($(prev).find('img').length == 1) {
+                if ($(prev).find('img').length == 1 && $(prev).data('value') != 2) {
                     if ($(item).find('img[src="/images/ground_tile1.png"]').length == 1) {
                         $(item).empty();
                         $(item).append('<img src="/images/ground_tile2.png" />');
                     }
                 }
 
-                if ($(item).find('img[src="/images/Personagem.png"]').length != 1 && $(next).find('img').length == 1) {
+                if ($(item).data('value') != 2 && $(next).find('img').length == 1) {
                     if ($(next).find('img[src="/images/ground_tile1.png"]').length == 1) {
                         $(next).empty();
                         $(next).append('<img src="/images/ground_tile2.png" />');
                     }
                 }
-                
+
+                SetIds();
                 //RemoveExceededItem(listId.split("-").pop());
             }
         });
@@ -420,16 +445,31 @@
         }
     }
 
-    function GetIcon(id) {
+    function SetIds() {
+        for (var k = 0; k < $('#listGroup').find('ul').length; k++){
+            $.each($($('#listGroup').find('ul')[k]).children(), function (i, e) {
+                $(e).attr('id', 'sortItem'+ (k + 1) + '-' + i);
+            });
+        }
+    }
+
+    function GetIcon(id, _class) {
+        var img = '<img ';
+        if (_class != null) img += 'class="' + _class + '" ';
+
         switch (id) {
             case 1:
-                return '<img src="/images/ground_tile1.png" />';
+                return img + 'src="/images/ground_tile1.png" />';
             case 2:
-                return '<img src="/images/Personagem.png" />';
+                return img + 'src="/images/Personagem.png" />';
             case 3:
-                return '<img src="/images/ground-ramp-right_tile1.png" />';
+                return img + 'src="/images/ground-ramp-right_tile1.png" />';
             case 4:
-                return '<img src="/images/ground-ramp-left_tile1.png" />';
+                return img + 'src="/images/ground-ramp-left_tile1.png" />';
+            case 5:
+                return img + 'src="/images/flag.png" />';
+            case 6:
+                return img + 'src="/images/Serra.png" />';
             default:
                 return '&nbsp;';
         }
@@ -627,23 +667,30 @@
                 itemSelecteds = [];
 
                 $(this).css('border-color', 'red');
+                $(this).css('opacity', '.5');
                 itemSelecteds.push($(this).attr('id'));
 
-                GetTraps($(this).prev().data('value'), $(this).next().data('value'));
+                var idData = $(this).attr('id').split('sortItem')[1];
+                var listIndex = parseInt(idData.split('-')[0]);
+                var itemIndex = parseInt(idData.split('-')[1]);
+                var item = $('#backItem' + listIndex + '-' + itemIndex);
+                var prev = $('#backItem' + listIndex + '-' + (itemIndex + 1));
+                var next = $('#backItem' + listIndex + '-' + (itemIndex - 1));
+                SetTraps($(item).data('value'), $(next).data('value'), $(prev).data('value'));
             }
             else {
+                $(this).css('opacity', '.1');
                 $(this).css('border-color', '#ced4da');
                 itemSelecteds.splice(itemSelecteds.indexOf($(this).attr('id')), 1);
             }
         }
     });
 
-    $('.drag-sortable').on('click', function () {
-        var _listId = parseInt($(this).attr('id').split("-").pop()) + 1;
+    $('.drag-sortable').on('click', 'li', function () {
+        var _listId = $(this).data('value');
         if (_listId == 2) return;
         if (mode == 2) {
             $.each(itemSelecteds, function (i, e) {
-                console.log(e);
                 var idData = e.split('sortItem')[1];
                 var listIndex = idData.split('-')[0];
                 $($('#back-' + listIndex).children()[$('#' + e).index()]).replaceWith('<li class="form-control" id="backItem' + listIndex + '-' + $('#' + e).index() + '"  data-value="' + _listId + '">' + GetIcon(_listId) + '</li>');
@@ -659,7 +706,7 @@
                 var itemAbove = lis[index - 1];
                 var itemBelow = lis[index + 1];
 
-                if ($(itemAbove).find('img').length == 1) { //[src="/images/ground_tile1.png"]').length == 1 || $(itemAbove).find('img[src="/images/ground_tile2.png"]').length == 1) {
+                if ($(itemAbove).find('img').length == 1 && $(itemAbove).find('img[src="/images/Personagem.png"]').length == 0) { //[src="/images/ground_tile1.png"]').length == 1 || $(itemAbove).find('img[src="/images/ground_tile2.png"]').length == 1) {
                     $(item).empty();
                     $(item).append('<img src="/images/ground_tile2.png" />');
                 }
@@ -670,6 +717,7 @@
             });
 
             $('.sortable li').css('opacity', '.1');
+            $('.sortable li').css('border', '');
             itemSelecteds = [];
             $('.sortable li, .drag-sortable li').css('cursor', 'pointer');
         }
@@ -764,10 +812,10 @@
 <script type="text/javascript">
     function ChangeMode(id) {
         type = id;
+        mode = 1;
         if (id == 2) {
             $('#GroundBlocks').hide();
             $('#TrapBlocks').show();
-
             $('.sortable').sortable('disable');
             $('.drag-sortable').sortable('disable');
             $('.sortable li, .drag-sortable li').css('cursor', 'pointer');
@@ -782,9 +830,43 @@
             $('.sortable li, .drag-sortable li').css('cursor', 'grab');
             $('#listGroup .form-control').css('border-color', '#ced4da');
         }
+        $('#ItemSelect')[0].checked = false;
+        $('#listGroup .form-control').css('border-color', '');
+        $('.sortable li').css('opacity', '.1');
+        $('#TrapDiv ul').remove();
+        $('#noTrapMessage').show();
     }
 
-    function GetTraps(nextData, prevData) {
-
+    function SetTraps(currentData, nextData, prevData) {
+        var traps = [];
+        if (currentData != 0 && currentData != 2) {
+            if (nextData == 0) {
+                $.extend(traps, trapGroundNotAbove);
+            }
+        }
+        $('#TrapDiv ul').remove();
+        if (traps.length > 0) {
+            $.each(traps, function (i, e) {
+                var list = $('<ul>', { class: 'drag-sortable' });
+                var listItem = $('<li>', { class: 'form-control', style: 'text-align:center', onclick: '_SetTrap(' + e + ')' }).data('value', e);
+                $('#TrapDiv').append(list.append(listItem.append(GetIcon(e))));
+            });
+            $('#noTrapMessage').hide();
+        } else {
+            $('#noTrapMessage').show();
+        }
+        $('.sortable li, .drag-sortable li').css('cursor', 'pointer');
     }
+
+    function _SetTrap(data) {
+        $.each(itemSelecteds, function (i, e) {
+            var idData = e.split('sortItem')[1];
+            var listIndex = idData.split('-')[0];
+            $($('#back-' + listIndex).children()[$('#' + e).index()]).find('img[class="trapImg"]').remove();
+            $($('#back-' + listIndex).children()[$('#' + e).index()]).append(GetIcon(data, 'trapImg'));
+            $('#listGroup .form-control').css('border-color', '');
+            $('.sortable li').css('opacity', '.1');
+        });
+    }
+    
 </script>
