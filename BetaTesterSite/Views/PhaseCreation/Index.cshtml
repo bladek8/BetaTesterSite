@@ -193,7 +193,7 @@
 <script type="text/javascript">
     var mode = 1;
     var type = 1;
-    var trapGroundNotAbove = [5];
+    var trapGroundNotAbove = [6];
 
     SetTooltip();
     function SetTooltip() {
@@ -484,7 +484,7 @@
             var childs = $(allLists[i].children);
             _data = [];
             for (var j = 0; j < childs.length; j++) {
-                _data.push($(childs[j]).data('value'));
+                _data.push($(childs[j]).data('value') + ($(childs[j]).data('trap') != null ? '-' + $(childs[j]).data('trap') : ''));
             }
             data.push(_data.join(','));
         }
@@ -864,6 +864,7 @@
             var listIndex = idData.split('-')[0];
             $($('#back-' + listIndex).children()[$('#' + e).index()]).find('img[class="trapImg"]').remove();
             $($('#back-' + listIndex).children()[$('#' + e).index()]).append(GetIcon(data, 'trapImg'));
+            $($('#back-' + listIndex).children()[$('#' + e).index()]).data('trap', data);
             $('#listGroup .form-control').css('border-color', '');
             $('.sortable li').css('opacity', '.1');
         });
