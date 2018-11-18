@@ -34,6 +34,12 @@ namespace BetaTesterSite.Controllers
             return await Task.Run<IActionResult>(() => View());
         }
 
+        public async Task<IActionResult> Create()
+        {
+            return await Task.Run<IActionResult>(() => View());
+        }
+
+
         public async Task<IActionResult> Save([FromForm]string[] data, string name)
         {
             if (name == null) return await Task.Run<IActionResult>(() => Json(false));
@@ -82,7 +88,7 @@ namespace BetaTesterSite.Controllers
 
             try
             {
-                List<List<int>> data = new List<List<int>>();
+                List<List<string>> data = new List<List<string>>();
                 var credentials = Autenticar();
                 using (var service = OpenService(await credentials))
                 {
@@ -96,12 +102,12 @@ namespace BetaTesterSite.Controllers
                     using (StreamReader sr = new StreamReader(stream))
                     {
                         string s = "";
-                        List<int> line;
+                        List<string> line;
                         while ((s = sr.ReadLine()) != null)
                         {
-                            line = new List<int>();
+                            line = new List<string>();
                             var val = s.Split(',');
-                            line.AddRange(val.Select(x => int.Parse(x)));
+                            line.AddRange(val);
                             data.Add(line);
                         }
                     }

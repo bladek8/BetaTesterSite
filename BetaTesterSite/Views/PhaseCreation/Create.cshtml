@@ -63,9 +63,9 @@
         background-color: #333333;
     }
 
-    .remove-icon:hover{
-        color:red;
-        cursor:pointer;
+    .remove-icon:hover {
+        color: red;
+        cursor: pointer;
     }
 </style>
 <div id="AlertSuccess" class="alert alert-success fade show text-center" style="display: none;">
@@ -335,7 +335,7 @@
                         $(item).append('<img src="/images/ground_tile1.png" />');
                     }
                 }
-                
+
                 if ($(item).find('img').length == 0) {
                     if ($(next).find('img[src="/images/ground_tile2.png"]').length >= 1) {
                         $(next).empty();
@@ -751,6 +751,7 @@
     });
 
     function LoadArchive(data) {
+        console.log(data);
         $('.listGroup').empty();
         var uls = [];
         var _uls = [];
@@ -758,14 +759,34 @@
             var ul = $('<ul>', { id: 'back-' + (i + 1), class: 'back' });
             var _ul = $('<ul>', { id: 'sortable-' + (i + 1), class: 'sortable' });
             $.each(e, function (_i, _e) {
-                var icon = GetIcon(_e);
-                var index = _i - 1;
-                if (_i != 0 && (e[index] != 0 && e[index] != 2) && _e == 1) {
+                var _data;
+                var prevData;
+                var trap = null;
+
+                if (_e.indexOf('-') != -1) {
+                    _data = parseInt(_e.split('-')[0]);
+                    trap = parseInt(_e.split('-')[1]);
+                } else {
+                    _data = parseInt(_e);
+                }
+
+                if (_i != 0) {
+                    if (e[_i - 1].indexOf('-') != -1) prevData = parseInt(e[_i - 1].split('-')[0]);
+                    else prevData = parseInt(e[_i - 1]);
+                }
+                var icon = GetIcon(_data);
+                var iconTrap = '';
+
+                if (trap != null) {
+                    iconTrap = GetIcon(trap, 'trapImg');
+                }
+
+                if (_i != 0 && (prevData != 0 && prevData != 2) && _data == 1) {
                     icon = '<img src="/images/ground_tile2.png" />';
                 }
 
-                ul.append('<li class="form-control" id="backItem' + (i + 1) + '-' + _i + '"  data-value="' + _e + '">' + icon + '</li>');
-                _ul.append('<li class="form-control" id="sortItem' + (i + 1) + '-' + _i + '"  data-value="0">&nbsp;</li>');
+                ul.append('<li class="form-control" id="backItem' + (i + 1) + '-' + _i + '"  data-value="' + _data + '">' + icon + iconTrap + '</li>');
+                _ul.append('<li class="form-control" id="sortItem' + (i + 1) + '-' + _i + '"  data-value="0">&nbsp;' + iconTrap + '</li>');
 
             });
             uls.push(ul);
@@ -773,7 +794,7 @@
             ul = null;
             _ul = null;
         });
-        $('#backListGroup').append(uls); 
+        $('#backListGroup').append(uls);
         $('#listGroup').append(_uls);
 
         //for (var i = 1; i <= $('#listGroup').children().length; i++) {
@@ -901,7 +922,7 @@
         $('.sortable li').css('opacity', '.1');
     }
 
-    $('.remove-icon').click(function () { 
+    $('.remove-icon').click(function () {
         if (type == 1) {
             $.each(itemSelecteds, function (i, e) {
                 var idData = e.split('sortItem')[1];
@@ -921,5 +942,5 @@
         $('#listGroup .form-control').css('border-color', '');
         $('.sortable li').css('opacity', '.1');
     });
-    
+
 </script>
