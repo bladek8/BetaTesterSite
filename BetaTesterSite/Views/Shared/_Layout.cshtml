@@ -122,19 +122,25 @@
                             <a class="dropdown-item" href="@Url.Action("Index","Personagens")?typeId=2">Jimmy in the Hell</a>
                         </div>
                     </li>
-                    <li class="nav-item">
-                        @if (User.Identity.IsAuthenticated)
-                        {
-                            <a class="nav-link" href="@Url.Action("Create", "PhaseCreation")">Criação de Fase</a>
-                        }
-                        else
-                        {
+                    @if (User.Identity.IsAuthenticated)
+                    {
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="http://example.com" id="dropdown01" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Criação de Fases</a>
+                            <div class="dropdown-menu" aria-labelledby="dropdown01">
+                                <a class="dropdown-item" href="@Url.Action("Index", "PhaseCreation")"><i class="fas fa-list-ul"></i>&nbsp;Fases</a>
+                                <a class="dropdown-item" href="@Url.Action("Create", "PhaseCreation")"><i class="fas fa-th"></i>&nbsp;Criar de Fase</a>
+                            </div>
+                        </li>
+                    }
+                    else
+                    {
+                        <li class="nav-item">
                             <a class="nav-link" href="javascript:void(0)" onclick="OpenModal()">Criação de Fase</a>
                             <script type="text/javascript">
                                 function OpenModal() { $('#LoginModal').modal('show'); }
                             </script>
-                        }
-                    </li>
+                        </li>
+                    }
                     @if (User.Identity.IsAuthenticated)
                     {
                         if ((await AuthorizationService.AuthorizeAsync(User, "SystemVariablesManager")).Succeeded || (await AuthorizationService.AuthorizeAsync(User, "UserManager")).Succeeded)

@@ -168,8 +168,97 @@ namespace BetaTesterSite.Controllers
             }));
         }
 
+        [HttpPost]
+        [ActionName("ListIndexPhases")]
+        public async Task<IActionResult> ListRecentPhases()
+        {
+            var user = await userManager.GetUserAsync(User);
+            var UserId = user.Id;
+
+            var phases = (from y in this.context.PhasesIndexView
+                     join upf in this.context.UserPhaseFav on new { y.PhaseId, UserId } equals new { upf.PhaseId, upf.UserId } into up
+                     join pr in this.context.PhaseRate on new { y.PhaseId, UserId } equals new { pr.PhaseId, pr.UserId } into _pr
+                     from upf in up.DefaultIfEmpty()
+                     from pr in _pr.DefaultIfEmpty()
+                     orderby y.PhaseId descending
+                     select new Models.PhasesIndexViewModel{
+                         Completed = y.Completed,
+                         UserId = y.UserId,
+                         Dies = y.Dies,
+                         FileId = y.FileId,
+                         Name = y.Name,
+                         PhaseId = y.PhaseId,
+                         Played = y.Played,
+                         Rating = y.Rating,
+                         UserRate = pr != null? pr.Rate : 0,
+                         Tested = y.Tested,
+                         Fav = upf == null? false : true
+                     }).Take(10);
+
+            //var phases = this.context.PhasesIndexView.OrderByDescending(x => x.PhaseId).Take(10);
+
+            return await Task.Run<IActionResult>(() => Json(new
+            {
+                recordsTotal = phases.Count(),
+                recordsFiltered = phases.Count(),
+                data = phases
+            }));
+        }
 
         [HttpPost]
+        [ActionName("FavoritePhase")]
+        public async Task<IActionResult> FavoritePhase(int? phaseId)
+        {
+            if (!phaseId.HasValue) return Forbid();
+
+            var user = await userManager.GetUserAsync(User);
+            
+            if(this.context.UserPhaseFav.Any(x => x.PhaseId == phaseId && x.UserId == user.Id))
+            {
+                var userPhaseFav = this.context.UserPhaseFav.Single(x => x.PhaseId == phaseId && x.UserId == user.Id);
+                this.context.UserPhaseFav.Remove(userPhaseFav);
+            }
+            else
+            {
+                this.context.UserPhaseFav.Add(new DAL.UserPhaseFav
+                {
+                    PhaseId = phaseId.Value,
+                    UserId = user.Id
+                });
+            }
+            this.context.SaveChanges();
+
+            return await Task.Run<IActionResult>(() => Json(true));
+        }
+
+        [HttpPost]
+        [ActionName("SaveRate")]
+        public async Task<IActionResult> SaveRate(int? phaseId, int? rate)
+        {
+            if (!phaseId.HasValue && !rate.HasValue) return Forbid();
+
+        var user = await userManager.GetUserAsync(User);
+            
+            if(this.context.PhaseRate.Any(x => x.PhaseId == phaseId && x.UserId == user.Id))
+            {
+            var phaseRate = this.context.PhaseRate.Single(x => x.PhaseId == phaseId && x.UserId == user.Id);
+                phaseRate.Rate = rate.Value;
+            this.context.PhaseRate.Update(phaseRate);
+        }
+            else
+            {
+            this.context.PhaseRate.Add(new DAL.PhaseRate
+            {
+                PhaseId = phaseId.Value,
+                UserId = user.Id
+            });
+        }
+            this.context.SaveChanges();
+
+            return await Task.Run<IActionResult>(() => Json(true));
+        }
+
+    [HttpPost]
         [ActionName("ListPhases")]
         public async Task<IActionResult> ListPhases()
         {
@@ -197,7 +286,7 @@ namespace BetaTesterSite.Controllers
             //    }
             //}
             var user = await userManager.GetUserAsync(User);
-            var phases = this.context.Phase.Where(x => x.UserId == user.Id);
+            var phases = this.context.Phase.Where(x => x.UserId == user.Id).OrderByDescending(x => x.PhaseId);
 
 
             return await Task.Run<IActionResult>(() => Json(new

@@ -15,6 +15,9 @@ namespace BetaTesterSite.DAL
         public virtual DbSet<PolicyRole> PolicyRole { get; set; }
         public virtual DbSet<Policy> Policy { get; set; }
         public virtual DbSet<Phase> Phase { get; set; }
+        public virtual DbSet<PhasesIndexView> PhasesIndexView { get; set; }
+        public virtual DbSet<UserPhaseFav> UserPhaseFav { get; set; }
+        public virtual DbSet<PhaseRate> PhaseRate { get; set; }
 
         public BetaTesterContext(DbContextOptionsBuilder<BetaTesterContext> dbContextOptionsBuilder)
             : base(dbContextOptionsBuilder.Options)
@@ -28,14 +31,17 @@ namespace BetaTesterSite.DAL
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            modelBuilder.Entity<PhaseRate>().ToTable("PhaseRate");
+            modelBuilder.Entity<UserPhaseFav>().ToTable("UserPhaseFav");
+            modelBuilder.Entity<PhasesIndexView>().ToTable("PhasesIndexView");
             modelBuilder.Entity<Phase>(entity =>
             {
 
-                entity.Property(e => e.Fav).HasDefaultValueSql("((0))");
+                //entity.Property(e => e.Fav).HasDefaultValueSql("((0))");
                 entity.Property(e => e.Played).HasDefaultValueSql("((0))");
                 entity.Property(e => e.Dies).HasDefaultValueSql("((0))");
                 entity.Property(e => e.Completed).HasDefaultValueSql("((0))");
-                entity.Property(e => e.Rate).HasDefaultValueSql("((0))");
+                //entity.Property(e => e.Rate).HasDefaultValueSql("((0))");
                 entity.Property(e => e.Tested).HasDefaultValueSql("((0))");
             });
             modelBuilder.Entity<Policy>().ToTable("Policy");

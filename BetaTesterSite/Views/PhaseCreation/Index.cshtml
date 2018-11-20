@@ -1,829 +1,140 @@
 ﻿@{
-    ViewData["Title"] = "Criação de Fase";
-    int qtdBlocosIniciais = 30;
+    ViewData["Title"] = "Fases";
 }
 
-<style>
-    .sortable, .drag-sortable, .back {
-        list-style-type: none;
-        padding: 0;
-        float: left;
+<style type="text/css">
+    .no-background {
+        background-color: rgba(255,255,255, 0);
     }
 
-        .sortable li, .drag-sortable li, .back li {
-            cursor: grab;
-            width: 40px;
-            height: 40px;
-        }
-
-        .sortable li {
-            opacity: .1;
-        }
-
-            .sortable li img:not(.trapImg), .drag-sortable li img:not(.trapImg), .back li img:not(.trapImg) {
-                width: 40px;
-                height: 40px;
-                margin: -20px -13px;
-            }
-
-    .form-control {
-        border-radius: 0;
-    }
-
-    .trapImg {
-        position: absolute;
-        height: 15px;
-        width: 15px;
-        margin: -7px -2px;
-        background-color: rgba(255,255,255,.4);
-        border-radius: 2px;
-    }
-
-    #parent {
-        width: 100%;
-        height: 440px;
-        position: relative;
-        margin-bottom: 1em;
-        overflow-x: auto;
-        overflow-y: hidden;
-    }
-
-        #parent div {
-            width: 100%;
+    @@media screen and (min-width: 768px) {
+        .modal:before {
+            display: inline-block;
+            vertical-align: middle;
+            content: " ";
             height: 100%;
-            position: absolute;
-            top: 0;
-            left: 0;
         }
-
-    .highlight {
-        border: 1px solid red;
-        font-weight: bold;
-        font-size: 45px;
-        background-color: #333333;
     }
 
-    .remove-icon:hover{
-        color:red;
-        cursor:pointer;
+    .modal-dialog {
+        display: inline-block;
+        text-align: center;
+        vertical-align: middle;
     }
 </style>
-<div id="AlertSuccess" class="alert alert-success fade show text-center" style="display: none;">
-    <b>A fase foi salva com sucesso!</b>
-</div>
-<div id="AlertError" class="alert alert-danger fade show text-center" role="alert" style="display: none;">
-    <strong>Atenção!</strong> Arrume os erros!
-</div>
-<div class="card bg-light">
-    <div class="card-header">
-        <h4>Criação de Fase</h4>
-    </div>
-    <div class="card-body">
-        <div class="form-row" style="margin-bottom: 1em;">
-            <div class="col-md-12">
-                <div class="checkbox">
-                    <label><input type="checkbox" id="ItemSelect">&nbsp;Selecionar Item&nbsp;<i class="fas fa-info-circle" data-toggle="tooltip" data-placement="top" title="Quando habilitado os espaços abaixo podem ser selecionados e então escolhido um tipo de bloco para preenche-los"></i></label>
-                </div>
+
+<div class="row">
+    <div class="col-md-12">
+        <div class="card bg-light">
+            <div class="card-header">
+                Fases Mais Recentes
             </div>
-            <div class="col-md-12">
-                <div class="checkbox">
-                    <label><input type="checkbox" id="TrapCheckBox">&nbsp;Armadilhas&nbsp;<i class="fas fa-info-circle" data-toggle="tooltip" data-placement="top" title=""></i></label>
-                </div>
-            </div>
-        </div>
-        <script type="text/javascript">
-            $('#ItemSelect').change(function () {
-                SetSortable();
-                if ($('#ItemSelect')[0].checked) {
-                    $('.removeDiv').show();
-                    $(".sortable").sortable("option", "disabled", true);
-                    $(".drag-sortable").sortable("option", "disabled", true);
-                    $('.sortable li, .drag-sortable li').css('cursor', 'pointer');
-                    mode = 2;
-                    type = 1;
-                    itemSelecteds = [];
-                    $('#TrapCheckBox')[0].checked = false;
-                    $('#listGroup .form-control').css('border-color', '');
-                    $('.sortable li').css('opacity', '.1');
-                    $('#GroundBlocks').show();
-                    $('#TrapBlocks').hide();
-                }
-                else {
-                    $('.removeDiv').hide();
-                    mode = 1;
-                    SetSortable();
-                    $(".sortable").sortable("option", "disabled", false);
-                    $(".drag-sortable").sortable("option", "disabled", false);
-                    $('.sortable li, .drag-sortable li').css('cursor', 'grab');
-                    $('#listGroup .form-control').css('border-color', '#ced4da');
-                    itemSelecteds = [];
-                }
-            });
-        </script>
-        <div class="form-row" style="margin-bottom: 1em;">
-            <div class="col-md-12">
-                <div id="slider"></div>
-            </div>
-        </div>
-        <div id="parent">
-            <div style="user-select:none;" unselectable="on" onselectstart="return false;" onmousedown="return false;">
-                <div class="form-group listGroup" id="backListGroup">
-                    @for (int j = 1; j <= qtdBlocosIniciais; j++)
-                    {
-                        <ul id="back-@j" class="back">
-                            @for (int i = 0; i < 10; i++)
-                            {
-                                <li class="form-control" id="backItem@(j)-@(i)" data-value="0">&nbsp;</li>
-                            }
-                        </ul>
-                    }
-                </div>
-            </div>
-            <div class="" id="row1" style="z-index:10; user-select:none;" unselectable="on" onselectstart="return false;" onmousedown="return false;">
-                <div class="form-group listGroup" id="listGroup">
-                    @for (int j = 1; j <= qtdBlocosIniciais; j++)
-                    {
-                        <ul id="sortable-@j" class="sortable">
-                            @for (int i = 0; i < 10; i++)
-                            {
-                                <li class="form-control" id="sortItem@(j)-@(i)" data-value="0">&nbsp;</li>
-                            }
-                        </ul>
-                    }
-                </div>
-            </div>
-        </div>
-        <hr />
-        <div class="row" id="GroundBlocks">
-            <div class="col-md-10" style="margin-bottom:4em; user-select:none;" unselectable="on" onselectstart="return false;" onmousedown="return false;">
-                <ul id="stuckSortable-0" class="drag-sortable pop" data-popover="true" data-html="true" data-content="bloco padrão<br/><a href=javascript:void(0)' data-toggle='modal' data-target='#VideoExemploModal'>video</a>">
-                    <li class="form-control" style="text-align:center" data-value="1">
-                        <img style="position:relative;" src="~/images/ground_tile1.png" />
-                    </li>
-                </ul>
-                <ul id="stuckSortable-1" class="drag-sortable">
-                    <li class="form-control" style="text-align:center" data-value="2"><img src="~/images/Personagem.png" /></li>
-                </ul>
-                <ul id="stuckSortable-2" class="drag-sortable">
-                    <li class="form-control" style="text-align:center" data-value="3"><img src="~/images/ground-ramp-right_tile1.png" /></li>
-                </ul>
-                <ul id="stuckSortable-3" class="drag-sortable">
-                    <li class="form-control" style="text-align:center" data-value="4"><img src="~/images/ground-ramp-left_tile1.png" /></li>
-                </ul>
-                <ul id="stuckSortable-4" class="drag-sortable">
-                    <li class="form-control" style="text-align:center" data-value="5"><img src="~/images/flag.png" /></li>
-                </ul>
-            </div>
-            <div class="col-md-2 removeDiv" style="margin-bottom:4em; user-select:none; display:none;" unselectable="on" onselectstart="return false;" onmousedown="return false;">
-                <ul style="float: right;">
-                    <li class="form-control remove-icon" style="border:0; background-color: rgba(255, 255, 255, 0); text-align:center; font-size:1.5em;"><i class="fas fa-trash-alt"></i></li>
-                </ul>
-            </div>
-        </div>
-        <div class="row" id="TrapBlocks" style="display:none;">
-            <div class="col-md-10" style="margin-bottom:4em; user-select:none;" unselectable="on" onselectstart="return false;" onmousedown="return false;" id="TrapDiv">
-                <i id="noTrapMessage">Nenhuma armadilha possível, selecione outro bloco.</i>
-            </div>
-            <div class="col-md-2 removeDiv" style="margin-bottom:4em; user-select:none; display:none;" unselectable="on" onselectstart="return false;" onmousedown="return false;">
-                <ul style="float: right;">
-                    <li class="form-control remove-icon" style="border:0; background-color: rgba(255, 255, 255, 0); text-align:center; font-size:1.5em;"><i class="fas fa-trash-alt"></i></li>
-                </ul>
-            </div>
-        </div>
-        <hr />
-        <div class="row">
-            <div class="col-md-6">
-                <label>Nome*</label>
-                <input type="text" class="form-control" id="PhaseName" placeholder="Nome" />
+            <div class="card-body">
+                <table id="phaseTable" class="datatable display table table-sm table-bordered table-striped" style="border-collapse: collapse !important; width: 100%">
+                    <thead>
+                        <tr>
+                            <th style="width:75%;">Nome</th>
+                            <th style="width:15%;">Avaliação</th>
+                            <th style="text-align:center; width:10%;">&nbsp;</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
             </div>
         </div>
     </div>
-    <div class="card-footer">
-        <div class="btn-group float-right">
-            <button class="btn btn-success" data-toggle="modal" data-target="#OpenArchiveModal"><i class="fas fa-download"></i>&nbsp;Carregar Fase</button>
-            <button class="btn btn-success float-right" id="SaveButton"><i class="fas fa-upload"></i>&nbsp;Salvar</button>
-        </div>
-    </div>
 </div>
+
 <script type="text/javascript">
-    var mode = 1;
-    var type = 1;
-    var trapGroundNotAbove = [6];
+    var modelPhaseRate = 0;
 
-    SetTooltip();
-    function SetTooltip() {
-        $('.pop').popover({
-            selector: '[data-popover]',
-            placement: 'top',
-            trigger: 'manual',
-            html: true,
-            animation: false
-        }).on('mouseenter', function () {
-            var _this = this;
-            $(this).popover('show');
-            $('.popover').on('mouseleave', function () {
-                $(_this).popover('hide');
-            });
-        }).on('mouseleave', function () {
-            var _this = this;
-            setTimeout(function () {
-                if (!$('.popover:hover').length) {
-                    $(_this).popover('hide');
+    var phaseTable = $('#phaseTable').DataTable({
+        proccessing: true,
+        serverSide: true,
+        searching: true,
+        lengthChange: false,
+        autoWidth: false,
+        dom: 'tip',
+        ajax: {
+            url: '@Url.Action("ListIndexPhases", "PhaseCreation")',
+            type: 'POST'
+        },
+        columns: [
+            {
+                data: 'Name',
+                render: function (data, type, row) {
+                    console.log(row);
+                    return "<a href='javascript:void(0)' onclick='OpenPhase(" + JSON.stringify(row) + ")' >" + row.name + "</a>";
                 }
-            }, 100);
-        });
-    }
-
-    function HasCharacter() {
-        var charQtd = 0;
-        var allLists = $('ul.sortable');
-        for (var i = 0; i < allLists.length; i++) {
-            var childs = $(allLists[i].children);
-            for (var j = 0; j < childs.length; j++) {
-                if ($(childs[j]).data('value') == '2')
-                    charQtd++;
             }
-        }
-        return charQtd > 1 ? true : false;
-    }
+            , {
+                data: 'Rating',
+                render: function (data, type, row) {
+                    if (row.rating == 0) return '<div style="cursor: pointer;" onclick="Rate(' + row.phaseId + ', ' + row.userRate + ')"><i class="far fa-star"></i></div>';
+                    var stars = '<div style="cursor: pointer;" onclick="Rate(' + row.phaseId + ', ' + row.userRate + ')">';
+                    for (var i = 0; i < row.rating; i++)
+                        stars += '<i class="fas fa-star" style="color:gold;"></i>&nbsp;';
+                    return stars + '</div>';
+                }
+            }
+            , {
+                orderable: false,
+                data: null,
+                className: 'text-center',
+                render: function (data, type, row) {
+                    var icon = row.fav ? '<i class="fas fa-star"></i>' : '<i class="far fa-star"></i>';
 
-        $("#slider").slider({
-            min: 1,
-            value: @qtdBlocosIniciais,
-            animate: "fast",
-            slide: function (event, ui) {
-                var sliderValue = $("#slider").slider("value");
-                SetLists(sliderValue);
-             }
+                    return "<a href='javascript:void(0)' onclick='Fav(" + row.phaseId + ")'>" + icon + "</a>";
+                }
+            }
+	    ]
     });
 
-    function SetSortable() {
-        var startList;
-        var startIndex;
-        $(".sortable").sortable({
-            placeholder: "highlight",
-            connectWith: ".sortable",
-            placeholder: "highlight",
-            start: function (event, ui) {
-                startList = event.currentTarget;
-                startIndex = ui.item.index();
-                var l = $(startList).attr('id').split('-').pop();
-                $(ui.item).empty();
-                $(ui.item).css('opacity', '1');
-
-                $(ui.item).data('value', $('#backItem' + l + '-' + startIndex).data('value'));
-                $(ui.item).data('trap', $('#backItem' + l + '-' + startIndex).data('trap'));
-                $(ui.item).append($('#backItem' + l + '-' + startIndex).find('img'));
-
-                //if ($('#backItem' + l + '-' + startIndex).find('img').length > 1) {
-                //    $(ui.item).append($('#backItem' + l + '-' + startIndex).find('img')[0]);
-                //    $(ui.item).data('value', $('#backItem' + l + '-' + startIndex).data('value'));
-                //    $(ui.item).append($('#backItem' + l + '-' + startIndex).find('img')[1]);
-                //    $(ui.item).data('trap', $('#backItem' + l + '-' + startIndex).data('trap'));
-                //}
-                //if ($('#backItem' + l + '-' + startIndex).find('img').length == 1) {
-                //    $(ui.item).append($('#backItem' + l + '-' + startIndex).find('img')[0]);
-                //    $(ui.item).data('value', $('#backItem' + l + '-' + startIndex).data('value'));
-                // }
-                $('<li class="form-control" id="sortItem' + l + '-' + startIndex + '" data-value="0">&nbsp;</li>').insertAfter($(startList).find('li')[startIndex]);
-            },
-            stop: function (event, ui) {
-                $('.drag-sortable li').css('background', '').css('border-color', '#ced4da').css('display', 'block');
-                $('.sortable li').css('background', '').css('border-color', '#ced4da').css('display', 'block');
-                $(ui.item).css('opacity', '.1');
-
-                var listId = ui.item.closest('ul').attr('id');
-                var backItems = $('#back-' + listId.split("-").pop()).closest("ul")[0].children;
-                var _startIndex = ui.item.index();
-
-                if (_startIndex == 10)
-                    ui.item.remove();
-                else {
-                    var items = $('#' + listId).sortable("widget")[0].children;
-                    $(backItems[_startIndex]).data('value', $(ui.item).data('value'));
-                    $(backItems[_startIndex]).data('trap', $(ui.item).data('trap'));
-                    $(backItems[_startIndex]).empty();
-                    if ($(items[_startIndex]).find('img').length > 0) {
-                        $(backItems[_startIndex]).append($(items[_startIndex]).find('img'));
-                    }
-                    items[_startIndex + 1].remove();
-                }
-
-                var i = $(startList).attr('id').split('-').pop();
-                var _backItems = $('#back-' + i).closest("ul")[0].children;
-                var nextItem = $(_backItems[startIndex + 1]);
-                var item = $(backItems[_startIndex]);
-                var prev = $(backItems[_startIndex - 1]);
-                var next = $(backItems[_startIndex + 1]);
-
-                if ($(nextItem).find('img').length >= 1) {
-                    if ($(nextItem).find('img[src="/images/ground_tile2.png"]').length >= 1) {
-                        $(nextItem).empty();
-                        $(nextItem).append('<img src="/images/ground_tile1.png" />');
-                    }
-                }
-
-                if ($(prev).find('img').length >= 1 && $(prev).data('value') != 2) {
-                    if ($(item).find('img[src="/images/ground_tile1.png"]').length >= 1) {
-                        $(item).empty();
-                        $(item).append('<img src="/images/ground_tile2.png" />');
-                    }
-                }
-                else {
-                    if ($(item).find('img[src="/images/ground_tile2.png"]').length >= 1) {
-                        $(item).empty();
-                        $(item).append('<img src="/images/ground_tile1.png" />');
-                    }
-                }
-                
-                if ($(item).find('img').length == 0) {
-                    if ($(next).find('img[src="/images/ground_tile2.png"]').length >= 1) {
-                        $(next).empty();
-                        $(next).append('<img src="/images/ground_tile1.png" />');
-                    }
-                }
-
-                if ($(item).data('value') != 2 && $(item).find('img').length >= 1 && $(next).find('img').length >= 1) {
-                    if ($(next).find('img[src="/images/ground_tile1.png"]').length >= 1) {
-                        $(next).empty();
-                        $(next).append('<img src="/images/ground_tile2.png" />');
-                    }
-                }
-
-                SetIds();
-                //RemoveExceededItem(listId.split("-").pop());
-            }
-        });
-        $(".drag-sortable").sortable({
-            placeholder: "highlight",
-            connectWith: ".sortable",
-            placeholder: "highlight",
-            start: function (event, ui) {
-                startList = event.currentTarget;
-                var _listId = parseInt($(startList).attr('id').split("-").pop()) + 1;
-                $(startList).append('<li class="form-control" style="text-align:center"  data-value="' + _listId + '">' + GetIcon(_listId) + '</li>');
-            },
-            stop: function (event, ui) {
-                $('.drag-sortable li').css('background', '').css('border-color', '#ced4da').css('display', 'block');
-                $('.sortable li').css('background', '').css('border-color', '#ced4da').css('display', 'block');
-                var listId = ui.item.closest('ul').attr('id');
-                if (ui.item.closest('ul').hasClass('drag-sortable')) {
-                    ui.item.remove();
-                    return;
-                }
-
-                var backItems = $('#back-' + listId.split("-").pop()).closest("ul")[0].children;
-                var items = $('#' + listId).sortable("widget")[0].children;
-                var _i = ui.item.index();
-
-                if ($(startList).attr('id') == 'stuckSortable-1' && HasCharacter()) {
-                    ui.item.remove();
-                }
-                else {
-                    $(backItems[_i]).empty();
-                    $(backItems[_i]).data('value', $(items[_i]).data('value'));
-                    if ($(items[_i]).find('img').length > 0) {
-                        $(backItems[_i]).append($(items[_i]).find('img')[0]);
-                    }
-                    if (_i == 10) items[_i].remove();
-                    else items[_i + 1].remove();
-                }
-
-                var i = $(startList).attr('id').split('-').pop();
-                var item = $(backItems[_i]);
-                var prev = $(backItems[_i - 1]);
-                var next = $(backItems[_i + 1]);
-
-                if ($(prev).find('img').length >= 1 && $(prev).data('value') != 2) {
-                    if ($(item).find('img[src="/images/ground_tile1.png"]').length >= 1) {
-                        $(item).empty();
-                        $(item).append('<img src="/images/ground_tile2.png" />');
-                    }
-                }
-
-                if ($(item).data('value') != 2 && $(next).find('img').length >= 1) {
-                    if ($(next).find('img[src="/images/ground_tile1.png"]').length >= 1) {
-                        $(next).empty();
-                        $(next).append('<img src="/images/ground_tile2.png" />');
-                    }
-                }
-
-                SetIds();
-                //RemoveExceededItem(listId.split("-").pop());
-            }
-        });
-
-        $('.sortable, .drag-sortable').on('mousedown', '.form-control', function () {
-            if (mode == 2 || type == 2)
-                $(this).css('cursor', 'pointer');
-            else {
-                $(this).css('cursor', 'grabbing');
-                $('.pop').popover('hide');
-            }
-        }).on('mouseup', '.form-control', function () {
-            if (mode == 2 || type == 2)
-                $(this).css('cursor', 'pointer');
-            else
-                $(this).css('cursor', 'grab');
-        });
-    }
-    $(window).ready(function () {
-        SetSortable();
-        $('[data-toggle="tooltip"]').tooltip();
-    });
-
-    //function RemoveExceededItem(index) {
-    //    if ($('#sortable-' + index)[0].children.length <= 10) return;
-
-    //    $('#sortable-' + index)[0].children[$('#sortable-' + index)[0].children.length - 1].remove();
-    //}
-
-    function SetLists(size) {
-        size = size < 20 ? 20 : size;
-        if (size > $('#listGroup').find('ul').length) {
-            if ($('#listGroup').find('ul').length < size) {
-                for (var k = $('#listGroup').find('ul').length + 1; k <= size; k++) {
-                    $('.listGroup').append('<ul id="sortable-' + k + '" class="sortable">' +
-                    @for (int i = 0; i < 10; i++)
-                    {
-                        <text>
-                        '<li class="form-control" id="sortItem' + k + '-@(i)"  data-value="0">&nbsp;</li>' +
-                        </text>
-                    }
-                        '</ul>');
-                }
-            }
-
-            var totalWidth = size * 40;
-            $('.listGroup').width(totalWidth);
-            SetSortable();
-
-            if (mode == 2) {
-                $('.sortable').sortable('disable');
-                $('.drag-sortable').sortable('disable');
-                $('.sortable li, .drag-sortable li').css('cursor', 'pointer');
-            }
-
-        }
-        else {
-            $('.listGroup').width((20 * 40) );
-            $('.listGroup').find('ul')[$('.listGroup').find('ul').length - 1].remove();
-            SetLists(size);
-        }
-    }
-
-    function SetIds() {
-        for (var k = 0; k < $('#listGroup').find('ul').length; k++){
-            $.each($($('#listGroup').find('ul')[k]).children(), function (i, e) {
-                $(e).attr('id', 'sortItem'+ (k + 1) + '-' + i);
-            });
-        }
-    }
-
-    function GetIcon(id, _class) {
-        var img = '<img ';
-        if (_class != null) img += 'class="' + _class + '" ';
-
-        switch (id) {
-            case 1:
-                return img + 'src="/images/ground_tile1.png" />';
-            case 2:
-                return img + 'src="/images/Personagem.png" />';
-            case 3:
-                return img + 'src="/images/ground-ramp-right_tile1.png" />';
-            case 4:
-                return img + 'src="/images/ground-ramp-left_tile1.png" />';
-            case 5:
-                return img + 'src="/images/flag.png" />';
-            case 6:
-                return img + 'src="/images/Serra.png" />';
-            default:
-                return '&nbsp;';
-        }
-
-    }
-
-    function Save() {
-        var data = new Array();
-        var _data = [];
-        var allLists = $('ul.back');
-        for (var i = 0; i < allLists.length; i++) {
-            var childs = $(allLists[i].children);
-            _data = [];
-            for (var j = 0; j < childs.length; j++) {
-                _data.push($(childs[j]).data('value') + ($(childs[j]).data('trap') != null ? '-' + $(childs[j]).data('trap') : ''));
-            }
-            data.push(_data.join(','));
-        }
-
+    function Fav(phaseId) {
         $.ajax({
-            url: '@Url.Action("Save", "PhaseCreation")',
+            url: '@Url.Action("FavoritePhase", "PhaseCreation")',
             type: 'POST',
-            data: { Data: data, Name: $('#PhaseName').val() },
-            traditional: true,
-            dataType: 'json',
+            datatype: 'JSON',
+            data: { phaseId: phaseId },
             success: function (data) {
                 if (data) {
-                    $('#AlertSuccess').show();
-                    $('#AlertError').hide();
                     $('#phaseTable').DataTable().ajax.reload();
                 }
                 else {
-                    $('#AlertSuccess').hide();
-                    $('#AlertError').show();
+                    alert('Houve um erro ao favoritar.');
                 }
-                $('html,body').animate({ scrollTop: 0 }, 'slow');
             }
         });
     }
+    function Rate(phaseId, _modelPhaseRate) {
+        modelPhaseRate = _modelPhaseRate;
 
-    function Validate() {
-        var hasError = false;
-        $('.text-danger').remove();
+        $('.starRateDiv').find('svg').attr('data-prefix', 'far');
+        $('.starRate').css('color', 'black');
 
-        if (IsNullOrWhiteSpace($('#PhaseName').val())) {
-            hasError = true;
-            $('#PhaseName').after('<div class="text-danger">Preencha o nome!</div>');
+        for (var i = 0; i < modelPhaseRate; i++) {
+            $('#starRate-' + i).css('color', 'gold');
+            $('#starRateDiv-' + i).find('svg').attr('data-prefix', 'fas');
         }
-        if (hasError) {
-            $('#AlertSuccess').hide();
-            $('#AlertError').show();
-            $('html,body').animate({ scrollTop: 0 }, 'slow');
-        }
-        return !hasError;
+
+        $('#RateModal').modal('show');
+        $('#RateModelPhaseId').val(phaseId);
     }
-
-    $('#SaveButton').click(function () {
-        if (Validate()) {
-            Save();
-        }
-    });
 </script>
 
-<div class="modal fade" id="OpenArchiveModal" tabindex="-1" role="dialog" aria-hidden="true">
+
+<div class="modal fade" id="RateModal" tabindex="-1" role="dialog" aria-hidden="true" style="text-align: center;">
     <div class="modal-dialog modal-lg" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">Abrir Fase</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <div class="modal-body">
-                <div id="alertErrorAttachment" class="alert alert-danger fade show text-center" role="alert" style="display: none;">
-                    <strong>Problema ao abrir a fase!</strong>
-                </div>
-                <div class="row">
-                    <div class="col-md-12">
-                        <div class="form-group">
-                            <table id="phaseTable" class="datatable display table table-sm table-bordered table-striped" style="border-collapse: collapse !important; width: 100%">
-                                <thead>
-                                    <tr>
-                                        <th>Nome</th>
-                                        <th style="text-align:center;">&nbsp;</th>
-                                    </tr>
-                                </thead>
-                                <tbody></tbody>
-                            </table>
-                            <script type="text/javascript">
-                                    var phaseTable = $('#phaseTable').DataTable({
-                                        proccessing: true,
-                                        serverSide: true,
-                                        searching: true,
-                                        lengthChange: false,
-                                        autoWidth: false,
-                                        dom: 'tip',
-                                        ajax: {
-                                            url: '@Url.Action("ListPhases", "PhaseCreation")',
-                                            type: 'POST'
-                                        },
-                                        columns: [
-                                            {
-                                                data: 'Name',
-                                                render: function (data, type, row) {
-                                                    return "<a href='javascript:void(0)' onclick='OpenPhase(" + JSON.stringify(row) + ")' >" + row.name + "</a>";
-                                            }
-                                        }
-                                        , {
-                                            orderable: false,
-                                            data: null,
-                                            className: 'text-center',
-                                            render: function (data, type, row) {
-                                                return "<a href='javascript:void(0)' onclick='RemovePhase(" + JSON.stringify(row) + ")'><i class='fas fa-trash'></i></a>";
-                                            }
-                                        }
-		                            ]
-                                });
-
-                                function RemovePhase(id) {
-		                            if (confirm("Deseja realmente excluir esta fase?")) {
-                                        _RemovePhase(id, function () {
-                                            $('#phaseTable').DataTable().ajax.reload();
-                                            alert("Fase excluída com sucesso!");
-			                            });
-		                            }
-	                            }
-
-                                function _RemovePhase(data, callback) {
-		                            $.ajax({
-                                        url: '@Url.Action("RemovePhase", "PhaseCreation")',
-                                        type: 'POST',
-                                        data: { id: data.fileId },
-                                        traditional: true,
-                                        dataType: 'json',
-			                            success: callback
-		                            });
-                                }
-
-                                function OpenPhase(data) {
-                                    $.ajax({
-                                        url: '@Url.Action("OpenArchive", "PhaseCreation")',
-                                        type: 'POST',
-                                        data: { id: data.fileId },
-                                        traditional: true,
-                                        dataType: 'json',
-				                        success: function (data) {
-                                            $('#Archive').val("");
-					                        if (data == false) {
-                                                $('#alertErrorAttachment').hide();
-					                        }
-					                        else {
-                                                LoadArchive(data);
-                                                $('#OpenArchiveModal').modal('hide');
-					                        }
-				                        }
-			                        });
-                                }
-                            </script>
-                        </div>
+        <div class="modal-content no-background" style=" border: 0">
+            <div class="modal-body no-background">
+                <input type="hidden" id="RateModelPhaseId" />
+                <div class="row no-background">
+                    <div class="col-md-12 text-center no-background" id="StarRateArea">
+                        @for (int i = 0; i < 5; i++)
+                        {
+                            <div class="starRateDiv" style="display: inline-table; cursor:pointer;" id="starRateDiv-@(i)"><i class="far fa-star starRate" id="starRate-@(i)" style="font-size:2em;"></i></div>
+                        }
                     </div>
-                </div>
-            </div>
-            <div class="modal-footer">
-                <div class="col-md-6">
-                    <button type="button" aria-label="Close" class="btn btn-secondary float-let" data-dismiss="modal"><i class="fa fa-times"></i>&nbsp;Fechar</button>
-                </div>
-                <div class="col-md-6">
-                    <button type="button" class="btn btn-success float-right" id="OpenArchiveButton"><i class="fas fa-download"></i>&nbsp;Carregar Fase</button>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-<script type="text/javascript">
-    var itemSelecteds = [];
-
-    $('#listGroup').on('click', '.form-control', function () {
-        if (mode == 2) {
-            if (itemSelecteds.indexOf($(this).attr('id')) == -1) {
-                $(this).css('border-color', 'red');
-                $(this).css('opacity', '.5');
-                itemSelecteds.push($(this).attr('id'));
-            }
-            else {
-                $(this).css('border-color', '#ced4da');
-                $(this).css('opacity', '.1');
-                itemSelecteds.splice(itemSelecteds.indexOf($(this).attr('id')), 1);
-            }
-        }
-
-        if (type == 2) {
-            if (itemSelecteds.indexOf($(this).attr('id')) == -1) {
-                $('.form-control').css('border-color', '#ced4da');
-                $('.sortable li').css('opacity', '.1');
-                itemSelecteds = [];
-
-                $(this).css('border-color', 'red');
-                $(this).css('opacity', '.5');
-                itemSelecteds.push($(this).attr('id'));
-
-                var idData = $(this).attr('id').split('sortItem')[1];
-                var listIndex = parseInt(idData.split('-')[0]);
-                var itemIndex = parseInt(idData.split('-')[1]);
-                var item = $('#backItem' + listIndex + '-' + itemIndex);
-                var prev = $('#backItem' + listIndex + '-' + (itemIndex + 1));
-                var next = $('#backItem' + listIndex + '-' + (itemIndex - 1));
-                SetTraps($(item).data('value'), $(next).data('value'), $(prev).data('value'));
-            }
-            else {
-                $(this).css('opacity', '.1');
-                $(this).css('border-color', '#ced4da');
-                itemSelecteds.splice(itemSelecteds.indexOf($(this).attr('id')), 1);
-                SetTraps(0,0,0);
-            }
-        }
-    });
-
-    $('.drag-sortable').on('click', 'li', function () {
-        var _listId = $(this).data('value');
-        if (_listId == 2) return;
-        if (mode == 2) {
-            $.each(itemSelecteds, function (i, e) {
-                var idData = e.split('sortItem')[1];
-                var listIndex = idData.split('-')[0];
-                $($('#back-' + listIndex).children()[$('#' + e).index()]).replaceWith('<li class="form-control" id="backItem' + listIndex + '-' + $('#' + e).index() + '"  data-value="' + _listId + '">' + GetIcon(_listId) + '</li>');
-            });
-
-            $.each(itemSelecteds, function (i, e) {
-                var listIndex = e.split('sortItem')[1].split('-')[0];
-                var index = parseInt($('#' + e).index());
-                var ul = $('#back-' + listIndex);
-                var lis = $(ul).find('li');
-                var item = $($('#back-' + listIndex).children()[index]);
-                var itemAbove = lis[index - 1];
-                var itemBelow = lis[index + 1];
-
-                if ($(itemAbove).find('img').length >= 1 && $(itemAbove).find('img[src="/images/Personagem.png"]').length == 0) {
-                    $(item).empty();
-                    $(item).append('<img src="/images/ground_tile2.png" />');
-                }
-                if ($(itemBelow).find('img[src="/images/ground_tile1.png"]').length >= 1) {
-                    $(itemBelow).empty();
-                    $(itemBelow).append('<img src="/images/ground_tile2.png" />');
-                }
-            });
-
-            $('.sortable li').css('opacity', '.1');
-            $('.sortable li').css('border', '');
-            itemSelecteds = [];
-            $('.sortable li, .drag-sortable li').css('cursor', 'pointer');
-        }
-    });
-
-    function LoadArchive(data) {
-        $('.listGroup').empty();
-        var uls = [];
-        var _uls = [];
-        $.each(data, function (i, e) {
-            var ul = $('<ul>', { id: 'back-' + (i + 1), class: 'back' });
-            var _ul = $('<ul>', { id: 'sortable-' + (i + 1), class: 'sortable' });
-            $.each(e, function (_i, _e) {
-                var icon = GetIcon(_e);
-                var index = _i - 1;
-                if (_i != 0 && (e[index] != 0 && e[index] != 2) && _e == 1) {
-                    icon = '<img src="/images/ground_tile2.png" />';
-                }
-
-                ul.append('<li class="form-control" id="backItem' + (i + 1) + '-' + _i + '"  data-value="' + _e + '">' + icon + '</li>');
-                _ul.append('<li class="form-control" id="sortItem' + (i + 1) + '-' + _i + '"  data-value="0">&nbsp;</li>');
-
-            });
-            uls.push(ul);
-            _uls.push(_ul);
-            ul = null;
-            _ul = null;
-        });
-        $('#backListGroup').append(uls); 
-        $('#listGroup').append(_uls);
-
-        //for (var i = 1; i <= $('#listGroup').children().length; i++) {
-        //    $("#backItem-" + i).css('width', '40px');
-        //    $("#sortItem-" + i).css('width', '40px');
-        //}
-        SetSortable();
-        $("#slider").slider('value', data.length);
-        var totalWidth = data.length * 40;
-        $('.listGroup').width(totalWidth);
-    }
-
-
-
-    var totalWidth = @qtdBlocosIniciais * 40;
-    $('.listGroup').width(totalWidth);
-</script>
-
-<div class="modal fade" id="OpenArchiveModal" tabindex="-1" role="dialog" aria-hidden="true">
-    <div class="modal-dialog modal-lg" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">Abrir Fase</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <div class="modal-body">
-                <div id="alertErrorAttachment" class="alert alert-danger fade show text-center" role="alert" style="display: none;">
-                    <strong>Problema ao abrir a fase!</strong>
-                </div>
-                <div class="row">
-                    <div class="col-md-12">
-                        <div class="form-group">
-                            <table id="phaseTable" class="datatable display table table-sm table-bordered table-striped" style="border-collapse: collapse !important; width: 100%">
-                                <thead>
-                                    <tr>
-                                        <th>Nome</th>
-                                        <th style="text-align:center;">&nbsp;</th>
-                                    </tr>
-                                </thead>
-                                <tbody></tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="modal-footer">
-                <div class="col-md-6">
-                    <button type="button" aria-label="Close" class="btn btn-secondary float-let" data-dismiss="modal"><i class="fa fa-times"></i>&nbsp;Fechar</button>
                 </div>
             </div>
         </div>
@@ -831,95 +142,50 @@
 </div>
 
 <script type="text/javascript">
-    $('#TrapCheckBox').change(function () {
-        ChangeMode($('#TrapCheckBox')[0].checked ? 2 : 1);
-    });
-</script>
 
-<script type="text/javascript">
-    function ChangeMode(id) {
-        type = id;
-        mode = 1;
-        if (id == 2) {
-            $('.removeDiv').show();
-            $('#GroundBlocks').hide();
-            $('#TrapBlocks').show();
-            $('.sortable').sortable('disable');
-            $('.drag-sortable').sortable('disable');
-            $('.sortable li, .drag-sortable li').css('cursor', 'pointer');
-        }
-        else {
-            $('.removeDiv').hide();
-            $('#GroundBlocks').show();
-            $('#TrapBlocks').hide();
+    window.setInterval(function () {
+        $('.starRateDiv').mouseenter(function () {
+            $('.starRateDiv').find('svg').attr('data-prefix', 'far');
+            $('.starRate').css('color', 'black');
 
-            SetSortable();
-            $(".sortable").sortable("option", "disabled", false);
-            $(".drag-sortable").sortable("option", "disabled", false);
-            $('.sortable li, .drag-sortable li').css('cursor', 'grab');
-            $('#listGroup .form-control').css('border-color', '#ced4da');
-        }
-        itemSelecteds = [];
-        $('#ItemSelect')[0].checked = false;
-        $('#listGroup .form-control').css('border-color', '');
-        $('.sortable li').css('opacity', '.1');
-        $('#TrapDiv ul').remove();
-        $('#noTrapMessage').show();
-    }
+            var index = $(this).attr('id').split('-')[1];
 
-    function SetTraps(currentData, nextData, prevData) {
-        var traps = [];
-        if (currentData != 0 && currentData != 2) {
-            if (nextData == 0) {
-                $.extend(traps, trapGroundNotAbove);
+            for (var i = 0; i <= index; i++) {
+                $('#starRateDiv-' + i).find('svg').attr('data-prefix', 'fas');
+                $('#starRate-' + i).css('color', 'gold');
             }
-        }
-        $('#TrapDiv ul').remove();
-        if (traps.length > 0) {
-            $.each(traps, function (i, e) {
-                var list = $('<ul>', { class: 'drag-sortable' });
-                var listItem = $('<li>', { class: 'form-control', style: 'text-align:center', onclick: '_SetTrap(' + e + ')' }).data('value', e);
-                $('#TrapDiv').append(list.append(listItem.append(GetIcon(e))));
-            });
-            $('#noTrapMessage').hide();
-        } else {
-            $('#noTrapMessage').show();
-        }
-        $('.sortable li, .drag-sortable li').css('cursor', 'pointer');
-    }
+            $('.starRateDiv').unbind('mouseenter');
 
-    function _SetTrap(data) {
-        $.each(itemSelecteds, function (i, e) {
-            var idData = e.split('sortItem')[1];
-            var listIndex = idData.split('-')[0];
-            $($('#back-' + listIndex).children()[$('#' + e).index()]).find('img[class="trapImg"]').remove();
-            $($('#back-' + listIndex).children()[$('#' + e).index()]).append(GetIcon(data, 'trapImg'));
-            $($('#back-' + listIndex).children()[$('#' + e).index()]).data('trap', data);
         });
-        itemSelecteds = [];
-        $('#listGroup .form-control').css('border-color', '');
-        $('.sortable li').css('opacity', '.1');
-    }
+    }, 100);
 
-    $('.remove-icon').click(function () { 
-        if (type == 1) {
-            $.each(itemSelecteds, function (i, e) {
-                var idData = e.split('sortItem')[1];
-                var listIndex = idData.split('-')[0];
-                $($('#back-' + listIndex).children()[$('#' + e).index()]).replaceWith('<li class="form-control" id="backItem' + listIndex + '-' + $('#' + e).index() + '"  data-value="0">&nbsp;</li>');
-            });
-        } else if (type == 2) {
-            $.each(itemSelecteds, function (i, e) {
-                var idData = e.split('sortItem')[1];
-                var listIndex = idData.split('-')[0];
-                $($('#back-' + listIndex).children()[$('#' + e).index()]).find('img[class="trapImg"]').remove();
-                $($('#back-' + listIndex).children()[$('#' + e).index()]).removeData('trap');
-            });
+    $('#StarRateArea').on('mouseleave', function () {
+        $('.starRateDiv').find('svg').attr('data-prefix', 'far');
+        $('.starRate').css('color', 'black');
+
+        for (var i = 0; i < modelPhaseRate; i++) {
+            $('#starRateDiv-' + i).find('svg').attr('data-prefix', 'fas');
+            $('#starRate-' + i).css('color', 'gold');
         }
-
-        itemSelecteds = [];
-        $('#listGroup .form-control').css('border-color', '');
-        $('.sortable li').css('opacity', '.1');
     });
-    
+
+    $('.starRateDiv').click(function () {
+        var index = $(this).attr('id').split('-')[1];
+        modelPhaseRate = parseInt(index) + 1;
+        $.ajax({
+            url: '@Url.Action("SaveRate", "PhaseCreation")',
+            type: 'POST',
+            datatype: 'JSON',
+            data: { phaseId: $('#RateModelPhaseId').val(), rate: modelPhaseRate },
+            success: function (data) {
+                if (data) {
+                    $('#RateModal').modal('hide');
+                    $('#phaseTable').DataTable().ajax.reload();
+                }
+                else {
+                    alert('Houve um erro ao avaliar.');
+                }
+            }
+        });
+    });
 </script>
