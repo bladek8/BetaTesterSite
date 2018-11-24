@@ -513,14 +513,37 @@
     function Save() {
         var data = new Array();
         var _data = [];
+
+        var hasCharacter = false;
+        var hasFlag = false;
+
         var allLists = $('ul.back');
         for (var i = 0; i < allLists.length; i++) {
             var childs = $(allLists[i].children);
             _data = [];
             for (var j = 0; j < childs.length; j++) {
+                if ($(childs[j]).data('value') == 2) hasCharacter = true;
+                if ($(childs[j]).data('value') == 5) hasFlag = true;
+
                 _data.push($(childs[j]).data('value') + ($(childs[j]).data('trap') != null ? '-' + $(childs[j]).data('trap') : ''));
             }
             data.push(_data.join(','));
+        }
+
+        if (!hasCharacter) {
+            alert('É preciso ter o personagem!');
+            $('#AlertSuccess').hide();
+            $('#AlertError').show();
+            $('html,body').animate({ scrollTop: 0 }, 'slow');
+            return;
+        }
+
+        if (!hasFlag) {
+            alert('É preciso ter ao menos bandeira!');
+            $('#AlertSuccess').hide();
+            $('#AlertError').show();
+            $('html,body').animate({ scrollTop: 0 }, 'slow');
+            return;
         }
 
         $.ajax({
