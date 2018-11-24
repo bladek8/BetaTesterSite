@@ -208,7 +208,10 @@
 <script type="text/javascript">
     var mode = 1;
     var type = 1;
-    var trapGroundNotAbove = [6];
+    var trapInGround = [6];
+    var trapAboveGround = [7];
+    var directionalTrapsHor = [7];
+    var directionalTrapsVer = [];
 
     SetTooltip();
     function SetTooltip() {
@@ -275,19 +278,12 @@
                 $(ui.item).data('trap', $('#backItem' + l + '-' + startIndex).data('trap'));
                 $(ui.item).append($('#backItem' + l + '-' + startIndex).find('img'));
 
-                //if ($('#backItem' + l + '-' + startIndex).find('img').length > 1) {
-                //    $(ui.item).append($('#backItem' + l + '-' + startIndex).find('img')[0]);
-                //    $(ui.item).data('value', $('#backItem' + l + '-' + startIndex).data('value'));
-                //    $(ui.item).append($('#backItem' + l + '-' + startIndex).find('img')[1]);
-                //    $(ui.item).data('trap', $('#backItem' + l + '-' + startIndex).data('trap'));
-                //}
-                //if ($('#backItem' + l + '-' + startIndex).find('img').length == 1) {
-                //    $(ui.item).append($('#backItem' + l + '-' + startIndex).find('img')[0]);
-                //    $(ui.item).data('value', $('#backItem' + l + '-' + startIndex).data('value'));
-                // }
                 $('<li class="form-control" id="sortItem' + l + '-' + startIndex + '" data-value="0">&nbsp;</li>').insertAfter($(startList).find('li')[startIndex]);
             },
             stop: function (event, ui) {
+                console.log($('#backItem' + $(startList).attr('id').split('-').pop() + '-' + startIndex));
+                $('#backItem' + $(startList).attr('id').split('-').pop() + '-' + startIndex).removeData('value');
+                $('#backItem' + $(startList).attr('id').split('-').pop() + '-' + startIndex).removeData('trap');
                 $('.drag-sortable li').css('background', '').css('border-color', '#ced4da').css('display', 'block');
                 $('.sortable li').css('background', '').css('border-color', '#ced4da').css('display', 'block');
                 $(ui.item).css('opacity', '.1');
@@ -443,11 +439,20 @@
         if (size > $('#listGroup').find('ul').length) {
             if ($('#listGroup').find('ul').length < size) {
                 for (var k = $('#listGroup').find('ul').length + 1; k <= size; k++) {
-                    $('.listGroup').append('<ul id="sortable-' + k + '" class="sortable">' +
+                    $('#listGroup').append('<ul id="sortable-' + k + '" class="sortable">' +
                     @for (int i = 0; i < 10; i++)
                     {
                         <text>
                         '<li class="form-control" id="sortItem' + k + '-@(i)"  data-value="0">&nbsp;</li>' +
+                        </text>
+                    }
+                        '</ul>');
+                    
+                    $('#backListGroup').append('<ul id="back-' + k + '" class="back">' +
+                    @for (int i = 0; i < 10; i++)
+                    {
+                        <text>
+                        '<li class="form-control" id="backItem' + k + '-@(i)"  data-value="0">&nbsp;</li>' +
                         </text>
                     }
                         '</ul>');
@@ -480,9 +485,10 @@
         }
     }
 
-    function GetIcon(id, _class) {
+    function GetIcon(id, _class, style) {
         var img = '<img ';
         if (_class != null) img += 'class="' + _class + '" ';
+        if (style != null) img += 'style="' + style + '" ';
 
         switch (id) {
             case 1:
@@ -497,10 +503,11 @@
                 return img + 'src="/images/flag.png" />';
             case 6:
                 return img + 'src="/images/Serra.png" />';
+            case 7:
+                return img + 'src="/images/totem.png" />';
             default:
                 return '&nbsp;';
         }
-
     }
 
     function Save() {
@@ -703,13 +710,25 @@
                 var item = $('#backItem' + listIndex + '-' + itemIndex);
                 var prev = $('#backItem' + listIndex + '-' + (itemIndex + 1));
                 var next = $('#backItem' + listIndex + '-' + (itemIndex - 1));
-                SetTraps($(item).data('value'), $(next).data('value'), $(prev).data('value'));
+                var left = $('#backItem' + (listIndex - 1) + '-' + itemIndex);
+                var right = $('#backItem' + (listIndex + 1) + '-' + itemIndex);
+                SetTraps($(item).data('value') == null ? 0 : $(item).data('value'),
+                    $(next).data('value') == null ? 0 : $(next).data('value'),
+                    $(prev).data('value') == null ? 0 : $(prev).data('value'),
+                    $(left).data('value') == null ? 0 : $(left).data('value'),
+                    $(right).data('value') == null ? 0 : $(right).data('value'),
+                    $(item).data('trap') == null ? 0 : $(item).data('trap'),
+                    $(next).data('trap') == null ? 0 : $(next).data('trap'),
+                    $(prev).data('trap') == null ? 0 : $(prev).data('trap'),
+                    $(left).data('trap') == null ? 0 : $(left).data('trap'),
+                    $(right).data('trap') == null ? 0 : $(right).data('trap'),
+                );
             }
             else {
                 $(this).css('opacity', '.1');
                 $(this).css('border-color', '#ced4da');
                 itemSelecteds.splice(itemSelecteds.indexOf($(this).attr('id')), 1);
-                SetTraps(0,0,0);
+                SetTraps(0,0,0,0,0);
             }
         }
     });
@@ -778,7 +797,7 @@
                 var iconTrap = '';
 
                 if (trap != null) {
-                    iconTrap = GetIcon(trap, 'trapImg');
+                    iconTrap = GetIcon(trap, 'trapImg', (_data == 0 ? 'margin: -7px 7px;' : ''));
                 }
 
                 if (_i != 0 && (prevData != 0 && prevData != 2) && _data == 1) {
@@ -796,11 +815,7 @@
         });
         $('#backListGroup').append(uls);
         $('#listGroup').append(_uls);
-
-        //for (var i = 1; i <= $('#listGroup').children().length; i++) {
-        //    $("#backItem-" + i).css('width', '40px');
-        //    $("#sortItem-" + i).css('width', '40px');
-        //}
+        
         SetSortable();
         $("#slider").slider('value', data.length);
         var totalWidth = data.length * 40;
@@ -888,18 +903,22 @@
         $('#noTrapMessage').show();
     }
 
-    function SetTraps(currentData, nextData, prevData) {
+    function SetTraps(currentData, nextData, prevData, leftData, rightData, cTrap, nTrap, pTrap, lTrap, rTrap) {
+
         var traps = [];
-        if (currentData != 0 && currentData != 2) {
-            if (nextData == 0) {
-                $.extend(traps, trapGroundNotAbove);
+        if (currentData != 2) {
+            if (nextData == 0 && currentData != 0 && cTrap == 0 && nTrap == 0 ) {
+                $.extend(traps, trapInGround);
+            }
+            if (currentData == 0 && prevData == 1 && cTrap == 0 && nTrap == 0 && pTrap == 0) {
+                $.extend(traps, trapAboveGround);
             }
         }
         $('#TrapDiv ul').remove();
         if (traps.length > 0) {
             $.each(traps, function (i, e) {
                 var list = $('<ul>', { class: 'drag-sortable' });
-                var listItem = $('<li>', { class: 'form-control', style: 'text-align:center', onclick: '_SetTrap(' + e + ')' }).data('value', e);
+                var listItem = $('<li>', { class: 'form-control', style: 'text-align:center', onclick: '_SetTrap(' + e + ', ' + currentData + ')' }).data('value', e);
                 $('#TrapDiv').append(list.append(listItem.append(GetIcon(e))));
             });
             $('#noTrapMessage').hide();
@@ -909,12 +928,12 @@
         $('.sortable li, .drag-sortable li').css('cursor', 'pointer');
     }
 
-    function _SetTrap(data) {
+    function _SetTrap(data, currentData) {
         $.each(itemSelecteds, function (i, e) {
             var idData = e.split('sortItem')[1];
             var listIndex = idData.split('-')[0];
             $($('#back-' + listIndex).children()[$('#' + e).index()]).find('img[class="trapImg"]').remove();
-            $($('#back-' + listIndex).children()[$('#' + e).index()]).append(GetIcon(data, 'trapImg'));
+            $($('#back-' + listIndex).children()[$('#' + e).index()]).append(GetIcon(data, 'trapImg', (currentData == 0? 'margin: -7px 7px;' : '')));
             $($('#back-' + listIndex).children()[$('#' + e).index()]).data('trap', data);
         });
         itemSelecteds = [];

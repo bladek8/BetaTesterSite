@@ -1,4 +1,17 @@
 ﻿@model int?
+
+<style type="text/css">
+    .box {
+        border-left: 1px solid;
+        border-bottom: 1px solid;
+        border-right: 1px solid;
+        padding: 10px;
+        border-bottom-left-radius: 8px;
+        border-bottom-right-radius: 8px;
+        border-color: #e9ecef;
+    }
+</style>
+    @*box-shadow: 2px -2px 1px grey;*@
 <div class="card shadow">
     <div class="card-body">
         <nav>
@@ -8,7 +21,7 @@
             </div>
         </nav>
         <div class="tab-content" id="nav-tabContent">
-            <div class="tab-pane fade show active" id="BetaViewComponent" role="tabpanel" aria-labelledby="nav_Beta" style="margin-top:25px;">
+            <div class="tab-pane fade show active box" id="BetaViewComponent" role="tabpanel" aria-labelledby="nav_Beta">
                 <div class="row">
                     <img src="~/images/Beta_Tester_Char1.png" class="col-md-4" style="background-color:lightgray; height:300px; margin-left: 4.16666667%; border-radius:15px; cursor:pointer; padding:0;" data-toggle="modal" data-target="#PersonagensModal" alt="">
                     @*<div class="col-md-3" style="background-color:lightgrey; margin-left: 15px; border-radius:15px;"></div>*@
@@ -20,7 +33,7 @@
                     </div>
                 </div>
             </div>
-            <div class="tab-pane fade" id="JimmyViewComponent" role="tabpanel" aria-labelledby="nav_Jimmy" style="margin-top:20px;">
+            <div class="tab-pane fade box" id="JimmyViewComponent" role="tabpanel" aria-labelledby="nav_Jimmy">
                 <div class="row">
                     <img src="~/images/Jimmy_in_the_hell.png" class="col-md-4" style="background-color:lightgray; height:300px; margin-left: 4.16666667%; border-radius:15px; cursor:pointer; padding:0;" data-toggle="modal" data-target="#PersonagensModal" alt="">
                     @*<div class="col-md-3" style="background-color:lightgrey; margin-left: 15px; border-radius:15px;"></div>*@

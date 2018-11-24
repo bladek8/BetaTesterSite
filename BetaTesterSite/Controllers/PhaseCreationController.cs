@@ -250,7 +250,8 @@ namespace BetaTesterSite.Controllers
             this.context.PhaseRate.Add(new DAL.PhaseRate
             {
                 PhaseId = phaseId.Value,
-                UserId = user.Id
+                UserId = user.Id,
+                Rate = rate.Value
             });
         }
             this.context.SaveChanges();
