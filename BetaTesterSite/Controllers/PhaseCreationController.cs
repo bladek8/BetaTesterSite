@@ -40,7 +40,7 @@ namespace BetaTesterSite.Controllers
         }
 
 
-        public async Task<IActionResult> Save([FromForm]string[] data, string name)
+        public async Task<IActionResult> Save([FromForm]string[] data, string name, string fileId)
         {
             if (name == null) return await Task.Run<IActionResult>(() => Json(false));
 
@@ -76,6 +76,19 @@ namespace BetaTesterSite.Controllers
             };
 
             this.context.Phase.Add(phase);
+
+            if (!string.IsNullOrWhiteSpace(fileId))
+            {
+                using (var service = OpenService(await credentials))
+                {
+                    var request = service.Result.Files.Delete(fileId);
+                    request.Execute();
+                }
+
+                var oldPhase = this.context.Phase.Single(x => x.FileId == fileId);
+                this.context.Phase.Remove(oldPhase);
+            }
+
             this.context.SaveChanges();
 
             return await Task.Run<IActionResult>(() => Json(true));
@@ -106,13 +119,13 @@ namespace BetaTesterSite.Controllers
                         while ((s = sr.ReadLine()) != null)
                         {
                             line = new List<string>();
-                            var val = s.Split(',');
+                            var val = s.Split('_');
                             line.AddRange(val);
                             data.Add(line);
                         }
                     }
                 }
-                return await Task.Run<IActionResult>(() => Json(data));
+                return await Task.Run<IActionResult>(() => Json(new { fileId = id, data = data }));
             }
             catch
             {
@@ -292,8 +305,8 @@ namespace BetaTesterSite.Controllers
 
             return await Task.Run<IActionResult>(() => Json(new
             {
-                recordsTotal = phases.Count(),
-                recordsFiltered = phases.Count(),
+                recordsTotal = phases.Count() > 10? 10 : phases.Count(),
+                recordsFiltered = phases.Count() > 10 ? 10 : phases.Count(),
                 data = phases
             }));
 

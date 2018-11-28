@@ -74,10 +74,54 @@
         body {
             font-family: 'Raleway', sans-serif;
         }
+
+        .shadow {
+            box-shadow: 0.3rem 0.3rem .1rem rgba(0,0,0,.15) !important;
+        }
+
+        .tab-content {
+            background: #E8E8E8;
+        }
+
+        .nav.nav-tabs a {
+            color: black;
+            background: #C4C4C4;
+        }
+
+        .nav.nav-tabs a.active {
+            background: #E8E8E8;
+            border: 0;
+        }
+        body{
+            background: #fafafa;
+        }
+        .btn-info {
+            background: #006053;
+            border-color: #006053;
+        }
+        .btn-success {
+            background: #006053;
+            border-color: #006053;
+        }
+            .btn-success:hover {
+                background: #00202f;
+                border-color: #00202f;
+            }
+            .btn-success:active {
+                background: #00202f !important;
+                border-color: #00202f !important;
+            }
+        .odd{
+            background: #e8e8e8;
+        }
+        .even {
+            background: #fafafa;
+        }
     </style>
 
 </head>
 <body>
+    <img src="~/images/beta_test_water.png" style="width:50%; height: 100%; opacity: .2; transform:translateX(50%); position: fixed;" />
     <div id="loading" style="display: none;">
         <div style="position: fixed; top: 0; left: 0; height: 100%; width: 100%; background-color: rgba(0, 0, 0, 0.4); z-index: 10000;">
         </div>
@@ -96,7 +140,7 @@
             $('#loading').hide();
         });
     </script>
-    <nav class="navbar navbar-light bg-light navbar-expand-lg fixed-top" style="box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);">
+    <nav class="navbar navbar-light bg-light navbar-expand-lg fixed-top" style="box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);">
         <div class="container-fluid">
             <a class="navbar-brand" href="@Url.Action("Index", "Home")">
                 <img src="~/images/beta test_logo.png" width="80" height="50" alt="">

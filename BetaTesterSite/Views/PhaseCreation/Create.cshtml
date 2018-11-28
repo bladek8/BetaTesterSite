@@ -68,6 +68,7 @@
         cursor: pointer;
     }
 </style>
+<input type="hidden" id="FileId" />
 <div id="AlertSuccess" class="alert alert-success fade show text-center" style="display: none;">
     <b>A fase foi salva com sucesso!</b>
 </div>
@@ -208,10 +209,12 @@
 <script type="text/javascript">
     var mode = 1;
     var type = 1;
-    var trapInGround = [6];
-    var trapAboveGround = [7];
-    var directionalTrapsHor = [7];
-    var directionalTrapsVer = [];
+    var trapInGround = [
+        { data: 6, hFlip: false, vFlip: true }
+    ];
+    var trapAboveGround = [
+        { data: 7, hFlip: true, vFlip: false }
+    ];
 
     SetTooltip();
     function SetTooltip() {
@@ -525,9 +528,16 @@
                 if ($(childs[j]).data('value') == 2) hasCharacter = true;
                 if ($(childs[j]).data('value') == 5) hasFlag = true;
 
-                _data.push($(childs[j]).data('value') + ($(childs[j]).data('trap') != null ? '-' + $(childs[j]).data('trap') : ''));
+                //_data.push($(childs[j]).data('value') + ($(childs[j]).data('trap') != null ? '-' + $(childs[j]).data('trap') : ''));
+                var trap = $(childs[j]).data('trap') != null ? $(childs[j]).data('trap') : null; 
+                var hFlipBlock = $(childs[j]).data('hFlipBlock') != null ? $(childs[j]).data('hFlipBlock') : false; 
+                var vFlipBlock = $(childs[j]).data('vFlipBlock') != null ? $(childs[j]).data('vFlipBlock') : false; 
+                var hFlipTrap = $(childs[j]).data('hFlipTrap') != null ? $(childs[j]).data('hFlipTrap') : false; 
+                var vFlipTrap = $(childs[j]).data('vFlipTrap') != null ? $(childs[j]).data('vFlipTrap') : false; 
+
+                _data.push('{"Block":' + $(childs[j]).data("value") + ',"Trap":' + trap + ',"HFlipBlock":' + hFlipBlock + ',"VFlipBlock":' + vFlipBlock + ',"HFlipTrap":' + hFlipTrap + ',"VFlipTrap":' + vFlipTrap + '}');
             }
-            data.push(_data.join(','));
+            data.push(_data.join('_'));
         }
 
         if (!hasCharacter) {
@@ -545,11 +555,10 @@
             $('html,body').animate({ scrollTop: 0 }, 'slow');
             return;
         }
-
         $.ajax({
             url: '@Url.Action("Save", "PhaseCreation")',
             type: 'POST',
-            data: { Data: data, Name: $('#PhaseName').val() },
+            data: { Data: data, Name: $('#PhaseName').val(), fileId: $('#FileId').val() },
             traditional: true,
             dataType: 'json',
             success: function (data) {
@@ -678,7 +687,8 @@
                                                 $('#alertErrorAttachment').hide();
 					                        }
 					                        else {
-                                                LoadArchive(data);
+                                                $('#FileId').val(data.fileId);
+                                                LoadArchive(data.data);
                                                 $('#OpenArchiveModal').modal('hide');
 					                        }
 				                        }
@@ -793,7 +803,6 @@
     });
 
     function LoadArchive(data) {
-        console.log(data);
         $('.listGroup').empty();
         var uls = [];
         var _uls = [];
@@ -801,20 +810,13 @@
             var ul = $('<ul>', { id: 'back-' + (i + 1), class: 'back' });
             var _ul = $('<ul>', { id: 'sortable-' + (i + 1), class: 'sortable' });
             $.each(e, function (_i, _e) {
-                var _data;
-                var prevData;
-                var trap = null;
-
-                if (_e.indexOf('-') != -1) {
-                    _data = parseInt(_e.split('-')[0]);
-                    trap = parseInt(_e.split('-')[1]);
-                } else {
-                    _data = parseInt(_e);
-                }
-
+                var data = JSON.parse(_e);
+                var _data = data.Block;
+                var prevData = 0;
+                var trap = data.Trap;
+                
                 if (_i != 0) {
-                    if (e[_i - 1].indexOf('-') != -1) prevData = parseInt(e[_i - 1].split('-')[0]);
-                    else prevData = parseInt(e[_i - 1]);
+                    prevData = JSON.parse(e[_i - 1]).Block;
                 }
                 var icon = GetIcon(_data);
                 var iconTrap = '';
@@ -827,7 +829,7 @@
                     icon = '<img src="/images/ground_tile2.png" />';
                 }
 
-                ul.append('<li class="form-control" id="backItem' + (i + 1) + '-' + _i + '"  data-value="' + _data + '">' + icon + iconTrap + '</li>');
+                ul.append('<li class="form-control" id="backItem' + (i + 1) + '-' + _i + '"  data-value="' + _data + '" data-trap="' + trap + '" data-hFlipTrap="' + data.hFlipTrap + '" data-vFlipTrap="' + data.vFlipTrap + '">' + icon + iconTrap + '</li>');
                 _ul.append('<li class="form-control" id="sortItem' + (i + 1) + '-' + _i + '"  data-value="0">&nbsp;' + iconTrap + '</li>');
 
             });
@@ -940,28 +942,49 @@
         $('#TrapDiv ul').remove();
         if (traps.length > 0) {
             $.each(traps, function (i, e) {
-                var list = $('<ul>', { class: 'drag-sortable' });
-                var listItem = $('<li>', { class: 'form-control', style: 'text-align:center', onclick: '_SetTrap(' + e + ', ' + currentData + ')' }).data('value', e);
-                $('#TrapDiv').append(list.append(listItem.append(GetIcon(e))));
+                if (e.hFlip && e.vFlip) {
+                    var list = $('<ul>', { class: 'drag-sortable pop' }).data('popover', true).data('html', true).data('content',
+                        $('<div>').append($('<ul>', { class: 'drag-sortable' }).append(($('<li>', { class: 'form-control', style: 'text-align:center', onclick: '_SetTrap(' + e.data + ', ' + (currentData == 0 ? true : false) + ',' + e.hFlip + ',' + e.vFlip + ')' }).data('value', e.data)).append(GetIcon(e.data))),
+                            $('<ul>', { class: 'drag-sortable' }).append(($('<li>', { class: 'form-control', style: 'text-align:center', onclick: '_SetTrap(' + e.data + ', ' + (currentData == 0 ? true : false) + ',' + e.hFlip + ',' + e.vFlip + ')' }).data('value', e.data)).append(GetIcon(e.data))),
+                            $('<ul>', { class: 'drag-sortable' }).append(($('<li>', { class: 'form-control', style: 'text-align:center', onclick: '_SetTrap(' + e.data + ', ' + (currentData == 0 ? true : false) + ',' + e.hFlip + ',' + e.vFlip + ')' }).data('value', e.data)).append(GetIcon(e.data))),
+                            $('<ul>', { class: 'drag-sortable' }).append(($('<li>', { class: 'form-control', style: 'text-align:center', onclick: '_SetTrap(' + e.data + ', ' + (currentData == 0 ? true : false) + ',' + e.hFlip + ',' + e.vFlip + ')' }).data('value', e.data)).append(GetIcon(e.data)))));
+                }
+                else if (e.hFlip || e.vFlip)
+                    var list = $('<ul>', { class: 'drag-sortable pop' }).data('popover', true).data('html', true).data('content',
+                        $('<div>').append($('<ul>', { class: 'drag-sortable' }).append(($('<li>', { class: 'form-control', style: 'text-align:center; cursor:pointer', onclick: '_SetTrap(' + e.data + ', ' + (currentData == 0 ? true : false) + ',' + false + ',' + false + ')' }).data('value', e.data)).append(GetIcon(e.data, '', 'cursor:pointer'))),
+                            $('<ul>', { class: 'drag-sortable' }).append(($('<li>', { class: 'form-control', style: 'text-align:center; cursor:pointer', onclick: '_SetTrap(' + e.data + ', ' + (currentData == 0 ? true : false) + ',' + e.hFlip + ',' + e.vFlip + ')' }).data('value', e.data)).append(GetIcon(e.data, '', (e.hFlip ? 'transform: scaleX(-1)' : 'transform: scaleY(-1)'))))));
+                else
+                    var list = $('<ul>', { class: 'drag-sortable' });
+
+                var listItem = $('<li>', { class: 'form-control', style: 'text-align:center', onclick: (e.hFlip || e.vFlip ? '' : '_SetTrap(' + e.data + ',' + (currentData == 0 ? true : false) + ',' + e.hFlip + ',' + e.vFlip + ')') }).data('value', e.data);
+                $('#TrapDiv').append(list.append(listItem.append(GetIcon(e.data))));
             });
+            SetTooltip();
             $('#noTrapMessage').hide();
         } else {
             $('#noTrapMessage').show();
         }
-        $('.sortable li, .drag-sortable li').css('cursor', 'pointer');
+        $('.drag-sortable li').css('cursor', 'pointer');
     }
 
-    function _SetTrap(data, currentData) {
+    function _SetTrap(data, emptyBlock, hFlip, vFlip) {
         $.each(itemSelecteds, function (i, e) {
             var idData = e.split('sortItem')[1];
             var listIndex = idData.split('-')[0];
             $($('#back-' + listIndex).children()[$('#' + e).index()]).find('img[class="trapImg"]').remove();
-            $($('#back-' + listIndex).children()[$('#' + e).index()]).append(GetIcon(data, 'trapImg', (currentData == 0? 'margin: -7px 7px;' : '')));
-            $($('#back-' + listIndex).children()[$('#' + e).index()]).data('trap', data);
-        });
+            var style = '';
+            style += (emptyBlock? 'margin: -7px 7px;' : '');
+            style += (hFlip? 'transform: scaleX(-1);' : '');
+            style += (vFlip? 'transform: scaleY(-1);' : '');
+            console.log(style);
+            $($('#back-' + listIndex).children()[$('#' + e).index()]).append(GetIcon(data, 'trapImg', style));
+            $($('#back-' + listIndex).children()[$('#' + e).index()]).data('trap', data).data('hFlipTrap', hFlip).data('vFlipTrap', vFlip);
+        }); 
         itemSelecteds = [];
         $('#listGroup .form-control').css('border-color', '');
         $('.sortable li').css('opacity', '.1');
+        $('.pop').popover('hide');
+        SetTraps();
     }
 
     $('.remove-icon').click(function () {
