@@ -210,10 +210,10 @@
     var mode = 1;
     var type = 1;
     var trapInGround = [
-        { data: 6, hFlip: false, vFlip: true }
+        { data: 6, hFlip: false, vFlip: true, arrow: true }
     ];
     var trapAboveGround = [
-        { data: 7, hFlip: true, vFlip: false }
+        { data: 7, hFlip: true, vFlip: false, arrow: false }
     ];
 
     SetTooltip();
@@ -450,7 +450,7 @@
                         </text>
                     }
                         '</ul>');
-                    
+
                     $('#backListGroup').append('<ul id="back-' + k + '" class="back">' +
                     @for (int i = 0; i < 10; i++)
                     {
@@ -505,7 +505,31 @@
             case 5:
                 return img + 'src="/images/flag.png" />';
             case 6:
-                return img + 'src="/images/Serra.png" />';
+                return img + 'src="/images/serra.png" />';
+            case 7:
+                return img + 'src="/images/totem.png" />';
+            default:
+                return '&nbsp;';
+        }
+    }
+    function GetIconNoArrow(id, _class, style) {
+        var img = '<img ';
+        if (_class != null) img += 'class="' + _class + '" ';
+        if (style != null) img += 'style="' + style + '" ';
+
+        switch (id) {
+            case 1:
+                return img + 'src="/images/ground_tile1.png" />';
+            case 2:
+                return img + 'src="/images/Personagem.png" />';
+            case 3:
+                return img + 'src="/images/ground-ramp-right_tile1.png" />';
+            case 4:
+                return img + 'src="/images/ground-ramp-left_tile1.png" />';
+            case 5:
+                return img + 'src="/images/flag.png" />';
+            case 6:
+                return img + 'src="/images/_serra.png" />';
             case 7:
                 return img + 'src="/images/totem.png" />';
             default:
@@ -529,11 +553,11 @@
                 if ($(childs[j]).data('value') == 5) hasFlag = true;
 
                 //_data.push($(childs[j]).data('value') + ($(childs[j]).data('trap') != null ? '-' + $(childs[j]).data('trap') : ''));
-                var trap = $(childs[j]).data('trap') != null ? $(childs[j]).data('trap') : null; 
-                var hFlipBlock = $(childs[j]).data('hFlipBlock') != null ? $(childs[j]).data('hFlipBlock') : false; 
-                var vFlipBlock = $(childs[j]).data('vFlipBlock') != null ? $(childs[j]).data('vFlipBlock') : false; 
-                var hFlipTrap = $(childs[j]).data('hFlipTrap') != null ? $(childs[j]).data('hFlipTrap') : false; 
-                var vFlipTrap = $(childs[j]).data('vFlipTrap') != null ? $(childs[j]).data('vFlipTrap') : false; 
+                var trap = $(childs[j]).data('trap') != null ? $(childs[j]).data('trap') : null;
+                var hFlipBlock = $(childs[j]).data('hFlipBlock') != null ? $(childs[j]).data('hFlipBlock') : false;
+                var vFlipBlock = $(childs[j]).data('vFlipBlock') != null ? $(childs[j]).data('vFlipBlock') : false;
+                var hFlipTrap = $(childs[j]).data('hFlipTrap') != null ? $(childs[j]).data('hFlipTrap') : false;
+                var vFlipTrap = $(childs[j]).data('vFlipTrap') != null ? $(childs[j]).data('vFlipTrap') : false;
 
                 _data.push('{"Block":' + $(childs[j]).data("value") + ',"Trap":' + trap + ',"HFlipBlock":' + hFlipBlock + ',"VFlipBlock":' + vFlipBlock + ',"HFlipTrap":' + hFlipTrap + ',"VFlipTrap":' + vFlipTrap + '}');
             }
@@ -814,7 +838,7 @@
                 var _data = data.Block;
                 var prevData = 0;
                 var trap = data.Trap;
-                
+
                 if (_i != 0) {
                     prevData = JSON.parse(e[_i - 1]).Block;
                 }
@@ -840,7 +864,7 @@
         });
         $('#backListGroup').append(uls);
         $('#listGroup').append(_uls);
-        
+
         SetSortable();
         $("#slider").slider('value', data.length);
         var totalWidth = data.length * 40;
@@ -932,7 +956,7 @@
 
         var traps = [];
         if (currentData != 2) {
-            if (nextData == 0 && currentData != 0 && cTrap == 0 && nTrap == 0 ) {
+            if (nextData == 0 && currentData != 0 && cTrap == 0 && nTrap == 0) {
                 $.extend(traps, trapInGround);
             }
             if (currentData == 0 && prevData == 1 && cTrap == 0 && nTrap == 0 && pTrap == 0) {
@@ -951,13 +975,16 @@
                 }
                 else if (e.hFlip || e.vFlip)
                     var list = $('<ul>', { class: 'drag-sortable pop' }).data('popover', true).data('html', true).data('content',
-                        $('<div>').append($('<ul>', { class: 'drag-sortable' }).append(($('<li>', { class: 'form-control', style: 'text-align:center; cursor:pointer', onclick: '_SetTrap(' + e.data + ', ' + (currentData == 0 ? true : false) + ',' + false + ',' + false + ')' }).data('value', e.data)).append(GetIcon(e.data, '', 'cursor:pointer'))),
-                            $('<ul>', { class: 'drag-sortable' }).append(($('<li>', { class: 'form-control', style: 'text-align:center; cursor:pointer', onclick: '_SetTrap(' + e.data + ', ' + (currentData == 0 ? true : false) + ',' + e.hFlip + ',' + e.vFlip + ')' }).data('value', e.data)).append(GetIcon(e.data, '', (e.hFlip ? 'transform: scaleX(-1)' : 'transform: scaleY(-1)'))))));
+                        $('<div>').append($('<ul>', { class: 'drag-sortable' }).append(($('<li>', { class: 'form-control', style: 'text-align:center; cursor:pointer', onclick: '_SetTrap(' + e.data + ', ' + (currentData == 0 ? true : false) + ',' + false + ',' + false + ')' }).data('value', e.data)).append((e.arrow ? GetIcon(e.data, '', 'cursor:pointer') : GetIconNoArrow(e.data, '', 'cursor:pointer')))),
+                            $('<ul>', { class: 'drag-sortable' }).append(($('<li>', { class: 'form-control', style: 'text-align:center; cursor:pointer', onclick: '_SetTrap(' + e.data + ', ' + (currentData == 0 ? true : false) + ',' + e.hFlip + ',' + e.vFlip + ')' }).data('value', e.data)).append((e.arrow ? GetIcon(e.data, '', (e.hFlip ? 'transform: scaleX(-1)' : 'transform: scaleY(-1)')) : GetIconNoArrow(e.data, '', (e.hFlip ? 'transform: scaleX(-1)' : 'transform: scaleY(-1)')))))));
                 else
                     var list = $('<ul>', { class: 'drag-sortable' });
 
+                
+
                 var listItem = $('<li>', { class: 'form-control', style: 'text-align:center', onclick: (e.hFlip || e.vFlip ? '' : '_SetTrap(' + e.data + ',' + (currentData == 0 ? true : false) + ',' + e.hFlip + ',' + e.vFlip + ')') }).data('value', e.data);
-                $('#TrapDiv').append(list.append(listItem.append(GetIcon(e.data))));
+                console.log(e);
+                $('#TrapDiv').append(list.append(listItem.append(GetIconNoArrow(e.data))));
             });
             SetTooltip();
             $('#noTrapMessage').hide();
@@ -973,13 +1000,13 @@
             var listIndex = idData.split('-')[0];
             $($('#back-' + listIndex).children()[$('#' + e).index()]).find('img[class="trapImg"]').remove();
             var style = '';
-            style += (emptyBlock? 'margin: -7px 7px;' : '');
-            style += (hFlip? 'transform: scaleX(-1);' : '');
-            style += (vFlip? 'transform: scaleY(-1);' : '');
+            style += (emptyBlock ? 'margin: -7px 7px;' : '');
+            style += (hFlip ? 'transform: scaleX(-1);' : '');
+            style += (vFlip ? 'transform: scaleY(-1);' : '');
             console.log(style);
             $($('#back-' + listIndex).children()[$('#' + e).index()]).append(GetIcon(data, 'trapImg', style));
             $($('#back-' + listIndex).children()[$('#' + e).index()]).data('trap', data).data('hFlipTrap', hFlip).data('vFlipTrap', vFlip);
-        }); 
+        });
         itemSelecteds = [];
         $('#listGroup .form-control').css('border-color', '');
         $('.sortable li').css('opacity', '.1');
