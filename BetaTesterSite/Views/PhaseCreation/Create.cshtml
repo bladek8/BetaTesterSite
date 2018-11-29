@@ -210,7 +210,8 @@
     var mode = 1;
     var type = 1;
     var trapInGround = [
-        { data: 6, hFlip: false, vFlip: true, arrow: true }
+        { data: 6, hFlip: false, vFlip: true, arrow: true },
+        { data: 8, hFlip: false, vFlip: false, arrow: false }
     ];
     var trapAboveGround = [
         { data: 7, hFlip: true, vFlip: false, arrow: false }
@@ -508,6 +509,8 @@
                 return img + 'src="/images/serra.png" />';
             case 7:
                 return img + 'src="/images/totem.png" />';
+            case 8:
+                return img + 'src="/images/poison_Trap.png" />';
             default:
                 return '&nbsp;';
         }
@@ -532,6 +535,8 @@
                 return img + 'src="/images/_serra.png" />';
             case 7:
                 return img + 'src="/images/totem.png" />';
+            case 8:
+                return img + 'src="/images/poison_Trap.png" />';
             default:
                 return '&nbsp;';
         }
