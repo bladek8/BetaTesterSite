@@ -11,7 +11,7 @@
                     <div class="input-group-prepend">
                         <span class="input-group-text" id="basic-addon1"><i class="fa fa-search"></i></span>
                     </div>
-                    <input id="_AttachmentListSearch" type="text" class="form-control" placeholder="Procurar..." />
+                    <input id="_UserListSearch" type="text" class="form-control" placeholder="Procurar..." />
                 </div>
             </div>
         </div>
@@ -76,14 +76,14 @@
     });
     function doneTyping() {
         if ($.fn.DataTable.isDataTable('#tableUsers')) {
-            datatables.search($('#search').val()).draw();
+            datatables.search($('#_UserListSearch').val()).draw();
         }
     }
-    $('#search').keyup(function () {
+    $('#_UserListSearch').keyup(function () {
         clearTimeout(typingTimer);
         typingTimer = setTimeout(doneTyping, doneTypingInterval);
     });
-    $('#search').keydown(function () {
+    $('#_UserListSearch').keydown(function () {
         clearTimeout(typingTimer);
 	});
 

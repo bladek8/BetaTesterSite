@@ -92,7 +92,6 @@
             {
                 data: 'Name',
                 render: function (data, type, row) {
-                    console.log(row);
                     return "<a href='javascript:void(0)' onclick='OpenPhase(" + JSON.stringify(row) + ")' >" + row.name + "</a>";
                 }
             }
@@ -226,6 +225,9 @@
                 <div class="form-group listGroup" id="backListGroup">
                 </div>
             </div>
+            <div>
+                <div id="graph" style="margin: 0 auto; height: 180px; line-height: 180px; text-align: center;"></div>
+            </div>
         </div>
     </div>
 </div>
@@ -244,11 +246,81 @@
                     alert('Erro ao carregar fase, recarregue a pagina e tente novamente.');
 				}
 				else {
-                    LoadArchive(data);
+                    LoadArchive(data.data);
 				}
 			}
-		});
+        });
+
+        if (data.played == 0) {
+            $('#graph').html('<i>Não foi jogada ainda.</i>');
+            return false;
+        }
+
+        var _data = [{ name: 'Mortes', y: data.dies, color: 'red' }
+            , {
+                name: 'Concluídas', y: data.completed, color: 'green'
+            }];
+
+        if (data.dies + data.completed < data.played) {
+            _data.push({ name: 'Não Concluídas', y: (data.played - (data.dies + data.completed)), color: 'lightgrey' });
+
+        }
+
+        console.log(_data);
+        Highcharts.chart('graph', {
+
+            chart: {
+                type: 'pie'
+            },
+
+            title: {
+                text: null
+            },
+
+            credits: {
+                enabled: false
+            },
+
+            exporting: {
+                enabled: false
+            },
+
+            yAxis: {
+                min: 0,
+                max: data.played,
+                lineWidth: 0,
+                tickPositions: []
+            },
+
+            legend: {
+                layout: 'vertical',
+                align: 'bottom',
+                verticalAlign: 'middle',
+                itemMarginTop: 10,
+                itemMarginBottom: 10
+            },
+
+            plotOptions: {
+                pie: {
+                    shadow: false,
+                    center: ['50%', '50%'],
+                    dataLabels: {
+                        enabled: false
+                    },
+                    showInLegend: true
+                }
+            },
+
+            series: [
+                {
+                    name: 'Vezes',
+                    size: '100%',
+                    innerSize: '60%',
+                    data: _data
+                }]
+        });
     }
+
 
     function LoadArchive(data) {
         $('.listGroup').empty();
@@ -256,20 +328,13 @@
         $.each(data, function (i, e) {
             var ul = $('<ul>', { id: 'back-' + (i + 1), class: 'back' });
             $.each(e, function (_i, _e) {
-                var _data;
-                var prevData;
-                var trap = null;
-
-                if (_e.indexOf('-') != -1) {
-                    _data = parseInt(_e.split('-')[0]);
-                    trap = parseInt(_e.split('-')[1]);
-                } else {
-                    _data = parseInt(_e);
-                }
+                var data = JSON.parse(_e);
+                var _data = data.Block;
+                var prevData = 0;
+                var trap = data.Trap;
 
                 if (_i != 0) {
-                    if (e[_i - 1].indexOf('-') != -1) prevData = parseInt(e[_i - 1].split('-')[0]);
-                    else prevData = parseInt(e[_i - 1]);
+                    prevData = JSON.parse(e[_i - 1]).Block;
                 }
                 var icon = GetIcon(_data);
                 var iconTrap = '';
@@ -282,20 +347,21 @@
                     icon = '<img src="/images/ground_tile2.png" />';
                 }
 
-                ul.append('<li class="form-control" id="backItem' + (i + 1) + '-' + _i + '"  data-value="' + _data + '">' + icon + iconTrap + '</li>');
+                ul.append('<li class="form-control" id="backItem' + (i + 1) + '-' + _i + '"  data-value="' + _data + '" data-trap="' + trap + '" data-hFlipTrap="' + data.hFlipTrap + '" data-vFlipTrap="' + data.vFlipTrap + '">' + icon + iconTrap + '</li>');
 
             });
             uls.push(ul);
             ul = null;
         });
         $('#backListGroup').append(uls);
+         
 
         $("#slider").slider('value', data.length);
         var totalWidth = data.length * 40;
         $('.listGroup').width(totalWidth);
-        $('#PhaseModal').modal('show')
+        $('#PhaseModal').modal('show');
     }
-
+      
     function GetIcon(id, _class) {
         var img = '<img ';
         if (_class != null) img += 'class="' + _class + '" ';

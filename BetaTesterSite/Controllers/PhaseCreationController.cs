@@ -183,7 +183,7 @@ namespace BetaTesterSite.Controllers
 
         [HttpPost]
         [ActionName("ListIndexPhases")]
-        public async Task<IActionResult> ListRecentPhases()
+        public async Task<IActionResult> ListRecentPhases(int start)
         {
             var user = await userManager.GetUserAsync(User);
             var UserId = user.Id;
@@ -206,17 +206,29 @@ namespace BetaTesterSite.Controllers
                          UserRate = pr != null? pr.Rate : 0,
                          Tested = y.Tested,
                          Fav = upf == null? false : true
-                     }).Take(10);
+                     }).Skip(start).Take(10);
 
             //var phases = this.context.PhasesIndexView.OrderByDescending(x => x.PhaseId).Take(10);
 
             return await Task.Run<IActionResult>(() => Json(new
             {
-                recordsTotal = phases.Count(),
-                recordsFiltered = phases.Count(),
+                recordsTotal = this.context.Phase.Count(),
+                recordsFiltered = this.context.Phase.Count(),
                 data = phases
             }));
         }
+
+        [HttpPost]
+        [ActionName("PhaseGraphData")]
+        public async Task<IActionResult> PhaseGraphData(string fileId)
+        {
+            if (string.IsNullOrWhiteSpace(fileId)) return Json( new { Total = 0});
+
+            var phase = this.context.Phase.Single(x => x.FileId == fileId);
+
+            return await Task.Run<IActionResult>(() => Json(new { Total = phase.Played, Dies = phase.Dies, Completed = phase.Completed }));
+        }
+        
 
         [HttpPost]
         [ActionName("FavoritePhase")]
@@ -272,9 +284,9 @@ namespace BetaTesterSite.Controllers
             return await Task.Run<IActionResult>(() => Json(true));
         }
 
-    [HttpPost]
+        [HttpPost]
         [ActionName("ListPhases")]
-        public async Task<IActionResult> ListPhases()
+        public async Task<IActionResult> ListPhases(int start)
         {
             //var phases = new List<PhaseViewModel>();
 
@@ -300,13 +312,13 @@ namespace BetaTesterSite.Controllers
             //    }
             //}
             var user = await userManager.GetUserAsync(User);
-            var phases = this.context.Phase.Where(x => x.UserId == user.Id).OrderByDescending(x => x.PhaseId);
+            var phases = this.context.Phase.Where(x => x.UserId == user.Id).OrderByDescending(x => x.PhaseId).Skip(start).Take(10);
 
 
             return await Task.Run<IActionResult>(() => Json(new
             {
-                recordsTotal = phases.Count() > 10? 10 : phases.Count(),
-                recordsFiltered = phases.Count() > 10 ? 10 : phases.Count(),
+                recordsTotal = this.context.Phase.Count(),
+                recordsFiltered = this.context.Phase.Count(),
                 data = phases
             }));
 

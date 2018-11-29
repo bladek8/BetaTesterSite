@@ -92,13 +92,24 @@ namespace BetaTesterSite.Controllers
 
         [HttpPost]
         [ActionName("List")]
-        public IActionResult _List(BetaTesterSite.Models.Shared.DataTablesAjaxPostModel filter)
+        public IActionResult _List(Models.Shared.DataTablesAjaxPostModel filter)
         {
-            var d = (from y in context.User where y.IsDeleted == false select y);
-            var _d = GetUserViewModels(d);
+            IQueryable<DAL.Identity.User> d;
+            IEnumerable<Models.UserViewModel> _d;
+            if (string.IsNullOrWhiteSpace(filter.search.value))
+            {
+                d = (from y in context.User where y.IsDeleted == false select y);
+                _d = GetUserViewModels(d).Skip(filter.start?? 0).Take(10);
+            }
+            else
+            {
+                d = (from y in context.User where y.IsDeleted == false
+                     where y.Email.ToUpper().Contains(filter.search.value.ToUpper()) || y.FirstName.ToUpper().Contains(filter.search.value.ToUpper())
+                     select y);
+                _d = GetUserViewModels(d).Skip(filter.start ?? 0).Take(10);
+            }
             return Json(new
             {
-                draw = filter.draw,
                 recordsTotal = d.Count(),
                 recordsFiltered = d.Count(),
                 data = _d
