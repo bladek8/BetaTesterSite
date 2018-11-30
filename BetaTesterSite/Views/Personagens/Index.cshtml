@@ -25,19 +25,19 @@
     </div>
     <div class="card-body">
         <div class="row" id="betaTesterGroup">
-            <img src="~/images/Beta_Tester_Char1 (2).png" class="col-md-3" style="background-color:lightgray; height:300px; margin-left: 4.16666667%; border-radius:15px; cursor:pointer; padding:0;" data-toggle="modal" data-target="#PersonagensModal" alt="">
+            <img src="~/images/Beta_Tester_Char_Feliz1.png" class="col-md-3" style="background-color:lightgray; height:300px; margin-left: 4.16666667%; border-radius:15px; cursor:pointer; padding:0;" data-toggle="modal" onclick="ChangeText(1)" data-target="#PersonagensModal" alt="">
             <div class="col-md-1"></div>
-            <img src="~/images/Beta_Tester_Char_Tedio1.png" class="col-md-3" style="background-color:lightgray; height:300px; border-radius:15px; cursor:pointer; padding:0;" data-toggle="modal" data-target="#PersonagensModal" alt="">
+            <img src="~/images/Beta_Tester_Char_Tedio1.png" class="col-md-3" style="background-color:lightgray; height:300px; border-radius:15px; cursor:pointer; padding:0;" data-toggle="modal" data-target="#PersonagensModal" onclick="ChangeText(2)" alt="">
             <div class="col-md-1"></div>
-            <img src="~/images/Beta_Tester_Char_Feliz1.png" class="col-md-3" style="background-color:lightgray; height:300px; border-radius:15px; cursor:pointer; padding:0;" data-toggle="modal" data-target="#PersonagensModal" alt="">
+            <img src="~/images/Beta_Tester_Char1 (2).png" class="col-md-3" style="background-color:lightgray; height:300px; border-radius:15px; cursor:pointer; padding:0;" data-toggle="modal" data-target="#PersonagensModal" onclick="ChangeText(3)" alt="">
         </div>
         <div class="row" id="JimmyGroup" style="display:none;">
-            <img src="~/images/Personagem_Corrida.gif" class="col-md-3" style="background-color:lightgray; height:300px; border-radius:15px; margin-left: 4.16666667%; cursor:pointer; padding:0;" data-toggle="modal" data-target="#PersonagensModal" alt="">
+            <img src="~/images/Personagem_Corrida.gif" class="col-md-3" style="background-color:lightgray; height:300px; border-radius:15px; margin-left: 4.16666667%; cursor:pointer; padding:0;" data-toggle="modal" data-target="#PersonagensModal" onclick="ChangeText(2)" alt="">
             @*<img src="~/images/Personagem.png" class="col-md-3" style="background-color:lightgray; height:300px; margin-left: 4.16666667%; border-radius:15px; cursor:pointer; padding:0;" data-toggle="modal" data-target="#PersonagensModal" alt="">*@
             <div class="col-md-1"></div>
-            <img src="~/images/Personagem_Corrida.gif" class="col-md-3" style="background-color:lightgray; height:300px; border-radius:15px; cursor:pointer; padding:0;" data-toggle="modal" data-target="#PersonagensModal" alt="">
+            <img src="~/images/Personagem_Corrida.gif" class="col-md-3" style="background-color:lightgray; height:300px; border-radius:15px; cursor:pointer; padding:0;" data-toggle="modal" data-target="#PersonagensModal" onclick="ChangeText(2)" alt="">
             <div class="col-md-1"></div>
-            <img src="~/images/Personagem_Pulo.gif" class="col-md-3" style="background-color:lightgray; height:300px; border-radius:15px; cursor:pointer; padding:0;" data-toggle="modal" data-target="#PersonagensModal" alt="">
+            <img src="~/images/Personagem_Pulo.gif" class="col-md-3" style="background-color:lightgray; height:300px; border-radius:15px; cursor:pointer; padding:0;" data-toggle="modal" data-target="#PersonagensModal" onclick="ChangeText(2)" alt="">
         </div>
     </div>
 </div>
@@ -61,7 +61,7 @@
     <div class="modal-dialog modal-sm" role="document">
         <div class="modal-content shadow">
             <div class="modal-header">
-                <h5 class="modal-title">Personagem</h5>
+                <h5 class="modal-title" id="modal-title">Personagem</h5>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
@@ -71,7 +71,8 @@
                     <div class="col-md-12">
                         <div class="form-group">
                             <label id="CharacterText">
-                                Nunca foi o melhor aluno da turma, mas acho que ele não merecia ter cair no inferno. Para sair dessa, ele precisa salvar seus amigos e roubar o Tridente do Capiroto que tem o poder de voltar no tempo.
+
+                                @*Nunca foi o melhor aluno da turma, mas acho que ele não merecia ter cair no inferno. Para sair dessa, ele precisa salvar seus amigos e roubar o Tridente do Capiroto que tem o poder de voltar no tempo.*@
                             </label>
                         </div>
                     </div>
@@ -80,6 +81,38 @@
         </div>
     </div>
 </div>
+
+<script type="text/javascript">
+    function ChangeText(character) {
+        switch (character) {
+            case 1:
+                $('#modal-title').text('Albert Feliz');
+                $('#CharacterText').text('Estremamente feliz, gosta de ser desafiado, ')
+                break;
+            case 2:
+                $('#modal-title').text('Albert medicado');
+                $('#CharacterText').text('Estremamente feliz, gosta de ser desafiado, ')
+                break;
+            case 3:
+                $('#modal-title').text('Albert sem medicação');
+                $('#CharacterText').text('Estremamente feliz, gosta de ser desafiado, ')
+                break;
+            case 4:
+                $('#modal-title').text('Albert medicado');
+                $('#CharacterText').text('Estremamente feliz, gosta de ser desafiado, ')
+                break;
+            case 5:
+                $('#modal-title').text('Albert medicado');
+                $('#CharacterText').text('Estremamente feliz, gosta de ser desafiado, ')
+                break;
+            case 6:
+                $('#modal-title').text('Albert medicado');
+                $('#CharacterText').text('Estremamente feliz, gosta de ser desafiado, ')
+                break;
+        }
+
+    }
+</script>
 
 @if (Model.HasValue)
 {

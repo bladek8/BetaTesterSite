@@ -214,7 +214,8 @@
         { data: 8, hFlip: false, vFlip: false, arrow: false }
     ];
     var trapAboveGround = [
-        { data: 7, hFlip: true, vFlip: false, arrow: false }
+        { data: 7, hFlip: true, vFlip: false, arrow: false },
+        { data: 9, hFlip: true, vFlip: false, arrow: false }
     ];
 
     SetTooltip();
@@ -511,6 +512,8 @@
                 return img + 'src="/images/totem.png" />';
             case 8:
                 return img + 'src="/images/poison_Trap.png" />';
+            case 9:
+                return img + 'src="/images/totem_flecha.png" />';
             default:
                 return '&nbsp;';
         }
@@ -537,6 +540,8 @@
                 return img + 'src="/images/totem.png" />';
             case 8:
                 return img + 'src="/images/poison_Trap.png" />';
+            case 9:
+                return img + 'src="/images/totem_flecha.png" />';
             default:
                 return '&nbsp;';
         }
