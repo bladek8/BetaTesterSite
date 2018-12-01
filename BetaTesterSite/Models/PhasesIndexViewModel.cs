@@ -18,5 +18,6 @@ namespace BetaTesterSite.Models
         public double Rating { get; set; }
         public double UserRate { get; set; }
         public bool Fav { get; set; }
+        public string CreatorName { get; set; }
     }
 }

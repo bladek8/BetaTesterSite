@@ -52,9 +52,11 @@ namespace BetaTesterSite.Controllers
             else
                 userId = Create(model);
 
-
-            ClearUserRoles(userId);
-            AddUserToRole(userId, (string.IsNullOrWhiteSpace(model.Role) ? "Administrator" : model.Role));
+            if (userId != 0)
+            {
+                ClearUserRoles(userId);
+                AddUserToRole(userId, (string.IsNullOrWhiteSpace(model.Role) ? "Administrator" : model.Role));
+            }
 
             return await Task.Run<IActionResult>(() => Json(userId));
         }
@@ -63,7 +65,8 @@ namespace BetaTesterSite.Controllers
         public int Create(UserViewModel model)
         {
             var id = _Create(model).Result;
-            AddUserToRole(id, "Administrator");
+            if (id != 0)
+                AddUserToRole(id, "Administrator");
 
             return id;
         }
@@ -99,11 +102,12 @@ namespace BetaTesterSite.Controllers
             if (string.IsNullOrWhiteSpace(filter.search.value))
             {
                 d = (from y in context.User where y.IsDeleted == false select y);
-                _d = GetUserViewModels(d).Skip(filter.start?? 0).Take(10);
+                _d = GetUserViewModels(d).Skip(filter.start ?? 0).Take(10);
             }
             else
             {
-                d = (from y in context.User where y.IsDeleted == false
+                d = (from y in context.User
+                     where y.IsDeleted == false
                      where y.Email.ToUpper().Contains(filter.search.value.ToUpper()) || y.FirstName.ToUpper().Contains(filter.search.value.ToUpper())
                      select y);
                 _d = GetUserViewModels(d).Skip(filter.start ?? 0).Take(10);

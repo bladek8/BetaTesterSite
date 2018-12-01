@@ -3,6 +3,7 @@
 @{
     ViewData["Title"] = "Dados do usuário";
     string fullName = Model.FirstName + " " + Model.LastName;
+    var saved = Context.Request.Query.ContainsKey("Saved");
 }
 <form id="form" action="@Url.Action("Info","Account")" method="post">
     <div class="card shadow">
@@ -74,14 +75,14 @@
 						}
 					});
 
-					@*@if (ViewData["ErrorMessage"] != null) {
+					@if (ViewData["ErrorMessage"] != null) {
 						<text>
 							$('#CurrentPassword').after('<div class="invalid-feedback">@ViewData["ErrorMessage"]</div>');
 							$('#alertForm').show();
 							$("html, body").animate({ scrollTop: 0 }, "slow");
 							$('#form .invalid-feedback').show();
 						</text>
-					}*@
+					}
                 </script>
             </div>
             <div class="col-md-6 float-right">
@@ -97,13 +98,16 @@
                         <input type="email" class="form-control" id="Email" name="Email" value="@Model.Email" placeholder="E-mail" style="background-color:#e8e8e8" disabled>
                     </div>
                 </div>
-                @*<div class="form-row">
-                    <div class="form-group col-md-6">
-                        <label class="control-label" for="PhoneNumber">Telefone</label>
-                        <input type="text" class="form-control phone" id="PhoneNumber" name="PhoneNumber" value="@Model.PhoneNumber" placeholder="Telefone" disabled>
-                    </div>
-                </div>*@
             </div>
         </div>
     </div>
 </form>
+
+<script type="text/javascript">
+    @if (saved)
+    {
+        <text>
+    alert('Senha trocada com sucesso!');
+        </text>
+    }
+</script>

@@ -17,7 +17,7 @@
             <div class="col-md-3"></div>
             <div class="col-md-6 text-center">
                 <div class="btn-group" role="group" aria-label="Basic example">
-                    <button type="button" id="betaTesterBtn" class="btn btn-info" style="background: #00202f;">Beta Tester</button>
+                    <button type="button" id="betaTesterBtn" class="btn btn-info">Beta Tester</button>
                     <button type="button" id="jimmyBtn" class="btn btn-info">Jimmy in the hell</button>
                 </div>
             </div>
@@ -32,12 +32,12 @@
             <img src="~/images/Beta_Tester_Char1 (2).png" class="col-md-3" style="background-color:lightgray; height:300px; border-radius:15px; cursor:pointer; padding:0;" data-toggle="modal" data-target="#PersonagensModal" onclick="ChangeText(3)" alt="">
         </div>
         <div class="row" id="JimmyGroup" style="display:none;">
-            <img src="~/images/Personagem_Corrida.gif" class="col-md-3" style="background-color:lightgray; height:300px; border-radius:15px; margin-left: 4.16666667%; cursor:pointer; padding:0;" data-toggle="modal" data-target="#PersonagensModal" onclick="ChangeText(2)" alt="">
+            <img src="~/images/Personagem_Corrida.gif" class="col-md-3" style="background-color:lightgray; height:300px; border-radius:15px; margin-left: 4.16666667%; cursor:pointer; padding:0;" data-toggle="modal" data-target="#PersonagensModal" onclick="ChangeText(4)" alt="">
             @*<img src="~/images/Personagem.png" class="col-md-3" style="background-color:lightgray; height:300px; margin-left: 4.16666667%; border-radius:15px; cursor:pointer; padding:0;" data-toggle="modal" data-target="#PersonagensModal" alt="">*@
             <div class="col-md-1"></div>
-            <img src="~/images/Personagem_Corrida.gif" class="col-md-3" style="background-color:lightgray; height:300px; border-radius:15px; cursor:pointer; padding:0;" data-toggle="modal" data-target="#PersonagensModal" onclick="ChangeText(2)" alt="">
+            <img src="~/images/Personagem_Corrida.gif" class="col-md-3" style="background-color:lightgray; height:300px; border-radius:15px; cursor:pointer; padding:0;" data-toggle="modal" data-target="#PersonagensModal" onclick="ChangeText(5)" alt="">
             <div class="col-md-1"></div>
-            <img src="~/images/Personagem_Pulo.gif" class="col-md-3" style="background-color:lightgray; height:300px; border-radius:15px; cursor:pointer; padding:0;" data-toggle="modal" data-target="#PersonagensModal" onclick="ChangeText(2)" alt="">
+            <img src="~/images/Personagem_Pulo.gif" class="col-md-3" style="background-color:lightgray; height:300px; border-radius:15px; cursor:pointer; padding:0;" data-toggle="modal" data-target="#PersonagensModal" onclick="ChangeText(6)" alt="">
         </div>
     </div>
 </div>
@@ -72,7 +72,7 @@
                         <div class="form-group">
                             <label id="CharacterText">
 
-                                @*Nunca foi o melhor aluno da turma, mas acho que ele não merecia ter cair no inferno. Para sair dessa, ele precisa salvar seus amigos e roubar o Tridente do Capiroto que tem o poder de voltar no tempo.*@
+                                @**@
                             </label>
                         </div>
                     </div>
@@ -87,27 +87,21 @@
         switch (character) {
             case 1:
                 $('#modal-title').text('Albert Feliz');
-                $('#CharacterText').text('Estremamente feliz, gosta de ser desafiado, ')
+                $('#CharacterText').text('osta de ser desafiado ao máximo. Quanto maior a dificuldade, mais feliz ele fica.');
                 break;
             case 2:
                 $('#modal-title').text('Albert medicado');
-                $('#CharacterText').text('Estremamente feliz, gosta de ser desafiado, ')
+                $('#CharacterText').text('Gosta de desafios na medida certa. Não facilite sua vida, mas também não torne o jogo impossível.');
                 break;
             case 3:
-                $('#modal-title').text('Albert sem medicação');
-                $('#CharacterText').text('Estremamente feliz, gosta de ser desafiado, ')
+                $('#modal-title').text('Albert pistola');
+                $('#CharacterText').text('Criado a leite com pera, ovomaltine e pão com mortadela. Odeia desafios, diz que é pró player, mas só joga no easy.')
                 break;
             case 4:
-                $('#modal-title').text('Albert medicado');
-                $('#CharacterText').text('Estremamente feliz, gosta de ser desafiado, ')
-                break;
             case 5:
-                $('#modal-title').text('Albert medicado');
-                $('#CharacterText').text('Estremamente feliz, gosta de ser desafiado, ')
-                break;
             case 6:
-                $('#modal-title').text('Albert medicado');
-                $('#CharacterText').text('Estremamente feliz, gosta de ser desafiado, ')
+                $('#modal-title').text('Jimmy');
+                $('#CharacterText').text('Nunca foi o melhor aluno da turma, mas acho que ele não merecia ter cair no inferno. Para sair dessa, ele precisa salvar seus amigos e roubar o Tridente do Capiroto que tem o poder de voltar no tempo.');
                 break;
         }
 
@@ -121,6 +115,8 @@
         <script type="text/javascript">
             $('#betaTesterGroup').show();
             $('#JimmyGroup').hide();
+            $('#jimmyBtn').css('background', '#006053');
+            $('#betaTesterBtn').css('background', '#00202f');
         </script>
     }
     else if (Model == 2)
@@ -128,6 +124,8 @@
         <script type="text/javascript">
             $('#betaTesterGroup').hide();
             $('#JimmyGroup').show();
+            $('#betaTesterBtn').css('background', '#006053');
+            $('#jimmyBtn').css('background', '#00202f');
         </script>
     }
 }

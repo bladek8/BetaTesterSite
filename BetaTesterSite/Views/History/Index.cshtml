@@ -11,7 +11,7 @@
         border-color: #e9ecef;
     }
 </style>
-    @*box-shadow: 2px -2px 1px grey;*@
+@*box-shadow: 2px -2px 1px grey;*@
 <div class="card shadow">
     <div class="card-body">
         <nav>
@@ -64,3 +64,23 @@
         </script>
     }
 }
+
+<div class="modal fade" id="ImgModal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div>
+            <img id="imgcontainer" style="min-width:200px;min-height:200px; max-width:400px;max-height:400px; display:none;">
+            <div id="carouselExampleControls" class="carousel " data-ride="carousel" style="display:none;">
+                <div class="carousel-inner" id="carouselContents">
+                </div>
+                <a class="carousel-control-prev" href="#carouselExampleControls" role="button" data-slide="prev">
+                    <span style="color:black;" class="carousel-control-prev-icon" aria-hidden="true"></span>
+                    <span class="sr-only">Previous</span>
+                </a>
+                <a class="carousel-control-next" href="#carouselExampleControls" role="button" data-slide="next">
+                    <span style="color:black;" class="carousel-control-next-icon" aria-hidden="true"></span>
+                    <span class="sr-only">Next</span>
+                </a>
+            </div>
+        </div>
+    </div>
+</div>

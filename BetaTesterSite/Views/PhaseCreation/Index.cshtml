@@ -62,7 +62,8 @@
                 <table id="phaseTable" class="datatable display table table-sm table-bordered table-striped" style="border-collapse: collapse !important; width: 100%">
                     <thead>
                         <tr>
-                            <th style="width:75%;">Nome</th>
+                            <th style="width:45%;">Nome</th>
+                            <th style="width:30%;">Criador</th>
                             <th style="width:15%;">Avaliação</th>
                             <th style="text-align:center; width:10%;">&nbsp;</th>
                         </tr>
@@ -93,6 +94,12 @@
                 data: 'Name',
                 render: function (data, type, row) {
                     return "<a href='javascript:void(0)' onclick='OpenPhase(" + JSON.stringify(row) + ")' >" + row.name + "</a>";
+                }
+            }
+            , {
+                data: 'CreatorName',
+                render: function (data, type, row) {
+                    return row.creatorName;
                 }
             }
             , {

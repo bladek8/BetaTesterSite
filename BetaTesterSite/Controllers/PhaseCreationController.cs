@@ -191,6 +191,7 @@ namespace BetaTesterSite.Controllers
             var phases = (from y in this.context.PhasesIndexView
                      join upf in this.context.UserPhaseFav on new { y.PhaseId, UserId } equals new { upf.PhaseId, upf.UserId } into up
                      join pr in this.context.PhaseRate on new { y.PhaseId, UserId } equals new { pr.PhaseId, pr.UserId } into _pr
+                     join u in this.context.User on y.UserId equals u.Id
                      from upf in up.DefaultIfEmpty()
                      from pr in _pr.DefaultIfEmpty()
                      orderby y.PhaseId descending
@@ -205,7 +206,8 @@ namespace BetaTesterSite.Controllers
                          Rating = y.Rating,
                          UserRate = pr != null? pr.Rate : 0,
                          Tested = y.Tested,
-                         Fav = upf == null? false : true
+                         Fav = upf == null? false : true,
+                         CreatorName = u.FirstName
                      }).Skip(start).Take(10);
 
             //var phases = this.context.PhasesIndexView.OrderByDescending(x => x.PhaseId).Take(10);

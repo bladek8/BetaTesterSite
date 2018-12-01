@@ -148,6 +148,13 @@
             hasError = true;
             $('#RegistreForm #_Email').after('<div class="text-danger">Insira o e-mail!</div>');
         }
+        else if ($('#RegistreForm #_Email').val().length < 6 ||
+            $('#RegistreForm #_Email').val().indexOf("@@") < 1 ||
+            $('#RegistreForm #_Email').val().indexOf(".") < 1
+        ) {
+            hasError = true;
+            $('#RegistreForm #_Email').after('<div class="text-danger">E-mail de forma incorreta!</div>');
+        }
         if (IsNullOrWhiteSpace($('#RegistreForm #_Password').val())) {
             hasError = true;
             $('#RegistreForm #_Password').after('<div class="text-danger">Insira a senha!</div>');
