@@ -1,0 +1,11 @@
+C:\Desenvolvimento\github.com-UpsideDownHub\BetaTesterSite\BetaTesterSite\bin\Release\netcoreapp2.0\BetaTesterSite.deps.json
+C:\Desenvolvimento\github.com-UpsideDownHub\BetaTesterSite\BetaTesterSite\bin\Release\netcoreapp2.0\BetaTesterSite.runtimeconfig.json
+C:\Desenvolvimento\github.com-UpsideDownHub\BetaTesterSite\BetaTesterSite\bin\Release\netcoreapp2.0\BetaTesterSite.runtimeconfig.dev.json
+C:\Desenvolvimento\github.com-UpsideDownHub\BetaTesterSite\BetaTesterSite\bin\Release\netcoreapp2.0\BetaTesterSite.dll
+C:\Desenvolvimento\github.com-UpsideDownHub\BetaTesterSite\BetaTesterSite\bin\Release\netcoreapp2.0\BetaTesterSite.pdb
+C:\Desenvolvimento\github.com-UpsideDownHub\BetaTesterSite\BetaTesterSite\obj\Release\netcoreapp2.0\BetaTesterSite.csprojResolveAssemblyReference.cache
+C:\Desenvolvimento\github.com-UpsideDownHub\BetaTesterSite\BetaTesterSite\obj\Release\netcoreapp2.0\BetaTesterSite.csproj.CoreCompileInputs.cache
+C:\Desenvolvimento\github.com-UpsideDownHub\BetaTesterSite\BetaTesterSite\obj\Release\netcoreapp2.0\BetaTesterSite.AssemblyInfoInputs.cache
+C:\Desenvolvimento\github.com-UpsideDownHub\BetaTesterSite\BetaTesterSite\obj\Release\netcoreapp2.0\BetaTesterSite.AssemblyInfo.cs
+C:\Desenvolvimento\github.com-UpsideDownHub\BetaTesterSite\BetaTesterSite\obj\Release\netcoreapp2.0\BetaTesterSite.dll
+C:\Desenvolvimento\github.com-UpsideDownHub\BetaTesterSite\BetaTesterSite\obj\Release\netcoreapp2.0\BetaTesterSite.pdb
